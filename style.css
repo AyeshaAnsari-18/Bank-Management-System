@@ -186,6 +186,11 @@ html,body{
     background-color: white;
 }
 
+#box2 img {
+    height: 100%;
+    width:100%;
+}
+
 #heading{
     height: 22%;
     width: 100%;
