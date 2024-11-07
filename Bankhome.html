@@ -1,0 +1,155 @@
+<?php
+    // Start the session to ensure access to session variables
+    session_start();
+
+    // Include the database connection file
+    include 'connection.php';
+
+    // Check if the user is logged in (i.e., if session contains userID)
+    if (!isset($_SESSION['userID'])) {
+    // Redirect to login page if not logged in
+    header("Location: login.html");
+    exit();
+    }
+
+    // Get customerID from the session
+    $customerID = $_SESSION['userID'];
+
+    // Fetch user information
+    $sql_user = "SELECT name FROM customer WHERE customerID = ?";
+    $stmt_user = $conn->prepare($sql_user);
+    $stmt_user->bind_param("i", $customerID);
+    $stmt_user->execute();
+    $result_user = $stmt_user->get_result();
+    $user = $result_user->fetch_assoc();
+
+    // Fetch account information
+    $sql_account = "SELECT AccountType, Balance, AccountID FROM account WHERE customer_customerID = ?";
+    $stmt_account = $conn->prepare($sql_account);
+    $stmt_account->bind_param("i", $customerID);
+    $stmt_account->execute();
+    $result_account = $stmt_account->get_result();
+    $account = $result_account->fetch_assoc();
+
+    // Fetch recent transactions (limit to last 5 for display purposes)
+    $sql_transactions = "SELECT transactionDate, Type, amount FROM transaction WHERE account_AccountID = ? ORDER BY transactionDate DESC LIMIT 5";
+    $stmt_transactions = $conn->prepare($sql_transactions);
+    $stmt_transactions->bind_param("i", $account['AccountID']);
+    $stmt_transactions->execute();
+    $result_transactions = $stmt_transactions->get_result();
+
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Dashboard</title>
+    <link rel="stylesheet" href="BankHome.css">
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@4.3.0/fonts/remixicon.css" rel="stylesheet"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+</head>
+<body>
+
+<!-- Main container -->
+<div id="main">
+    <!-- Header Section -->
+    <header id="header">
+        <!-- Bank Logo -->
+        <div id="logo">
+            <img src="logo.png" width="75px" alt="Bank Logo">
+        </div>
+
+        <!-- Navigation Links for User Functionalities -->
+        <nav class="nav-links">
+            <a href="#dashboard">Dashboard</a>
+            <a href="#accounts">Accounts</a>
+            <a href="#transfers">Transfers</a>
+            <a href="#loans">Loans</a>
+            <a href="#statements">Statements</a>
+            <a href="#support">Support</a>
+            <a href="#profile">Profile</a>
+            <a href="logout.php">Logout</a> <!-- Changed to a separate logout.php -->
+        </nav>
+
+        <!-- Search Bar Icon and Notification Icon -->
+        <div class="icon-group">
+            <div class="icon"><i class="ri-search-line"></i></div>
+            <div class="icon"><i class="ri-notification-3-line"></i></div>
+        </div>
+    </header>
+
+    <!-- User Info Section -->
+    <div class="user-info">
+        <!-- Display User's Name -->
+        <h1>Welcome, <?php echo htmlspecialchars($user['name']); ?></h1>
+        <!-- Customizing the Account Overview based on User Data -->
+        <p><?php echo htmlspecialchars($user['name']); ?>'s Account Overview</p>
+
+        <!-- Account Details -->
+        <div class="account-details">
+            <div class="detail-card">
+                <h2>Account Balance</h2>
+                <p>$<?php echo number_format($account['Balance'], 2); ?></p>
+            </div>
+            <div class="detail-card">
+                <h2>Account Number</h2>
+                <p>XXXX-XXXX-XXXX-<?php echo substr($account['AccountID'], -4); ?></p>
+            </div>
+            <div class="detail-card">
+                <h2>Account Type</h2>
+                <p><?php echo htmlspecialchars($account['AccountType']); ?></p>
+            </div>
+            <div class="detail-card">
+                <h2>Last Login</h2>
+                <p id="lastLogin">Loading...</p>
+            </div>
+        </div>
+
+        <script>
+        // Display current date and time for "Last Login"
+        const now = new Date();
+        const options = { year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric' };
+        document.getElementById('lastLogin').textContent = now.toLocaleString('en-US', options);
+        </script>
+
+        <!-- Recent Transactions Section -->
+        <div class="transactions">
+            <h2>Recent Transactions</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Description</th>
+                        <th>Amount</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php while($transaction = $result_transactions->fetch_assoc()): ?>
+                    <tr>
+                        <td><?php echo date("F j, Y", strtotime($transaction['transactionDate'])); ?></td>
+                        <td><?php echo htmlspecialchars($transaction['Type']); ?></td>
+                        <td><?php echo ($transaction['Type'] == "Debit" ? "-" : "+") . "$" . number_format($transaction['amount'], 2); ?></td>
+                    </tr>
+                    <?php endwhile; ?>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Footer Section -->
+<footer id="footer">
+    <div class="footer-content">
+        <p>© Copyright 2024 Aegis, Inc. <u>All rights reserved.</u> Various trademarks held by their respective owners.</p>
+    </div>
+</footer>
+
+</body>
+</html>
+
+<?php
+// Close the database connection
+$conn->close();
+?>
