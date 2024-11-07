@@ -181,7 +181,6 @@ html,body{
     height: 75%;
     width: 40%;
     border-radius: 15px;
-    box-shadow: 2px 3px 3px rgb(214, 211, 211);
     border: 2px rgb(214, 211, 211);
     background-color: white;
 }
@@ -264,7 +263,7 @@ html,body{
 
 #under1 {
     margin-left: 20px;
-    margin-top: 10px;
+    margin-top: 30px;
 }
 
 #under1 u {
@@ -324,7 +323,7 @@ html,body{
 
 #under2 {
     margin-left: 20px;
-    margin-top: 10px;
+    margin-top: 30px;
 }
 
 #under2 u {
@@ -384,7 +383,7 @@ html,body{
 
 #under3 {
     margin-left: 20px;
-    margin-top: 10px;
+    margin-top: 30px;
 }
 
 #under3 u {
@@ -444,7 +443,7 @@ html,body{
 
 #under4 {
     margin-left: 20px;
-    margin-top: 10px;
+    margin-top: 30px;
 }
 
 #under4 u {
