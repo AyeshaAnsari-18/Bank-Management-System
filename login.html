@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+   <meta charset="UTF-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <title>Login and Signup Form</title>
+   <link rel="stylesheet" href="loginStyle.css">
+</head>
+<body>
+   <div class="wrapper">
+      <div class="title">
+         <span id="formTitle">Login Form</span>
+      </div>
+      <!-- Login Form -->
+      <form action="authentication.php" method="POST">
+         <div class="field">
+            <input type="email" id="email" name="email" required placeholder=" ">
+            <label>Email Address</label>
+         </div>
+         <div class="field">
+            <input type="password" id="password" name="password" required minlength="8" placeholder=" ">
+            <label>Password</label>
+         </div>
+         <div class="content">
+            <div class="checkbox">
+               <input type="checkbox" id="remember-me">
+               <label for="remember-me">Remember me</label>
+            </div>
+         </div>
+         <div class="field">
+            <input type="submit" value="Login">
+         </div>
+         <div class="signup-link">
+            Not a user? <a href="#" onclick="toggleForm('signup')">Signup now</a>
+         </div>
+      </form>
+
+      <!-- Signup Form -->
+      <form id="signupForm" action="#" style="display: none;">
+         <div class="field">
+            <input type="text" required placeholder=" ">
+            <label>Full Name</label>
+         </div>
+         <div class="field">
+            <input type="email" required placeholder=" ">
+            <label>Email Address</label>
+         </div>
+         <div class="field">
+            <input type="password" required minlength="8" placeholder=" ">
+            <label>Password</label>
+         </div>
+         <div class="field">
+            <input type="password" required minlength="8" placeholder=" ">
+            <label>Confirm Password</label>
+         </div>
+         <div class="field">
+            <input type="submit" value="Signup">
+         </div>
+         <div class="signup-link">
+            Already a user? <a href="#" onclick="toggleForm('login')">Login now</a>
+         </div>
+      </form>
+   </div>
+
+   <script>
+      function toggleForm(form) {
+         const loginForm = document.getElementById("loginForm");
+         const signupForm = document.getElementById("signupForm");
+         const formTitle = document.getElementById("formTitle");
+
+         if (form === "signup") {
+            loginForm.style.display = "none";
+            signupForm.style.display = "block";
+            formTitle.textContent = "Signup Form";
+         } else {
+            loginForm.style.display = "block";
+            signupForm.style.display = "none";
+            formTitle.textContent = "Login Form";
+         }
+      }
+   </script>
+</body>
+</html>
