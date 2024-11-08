@@ -5,15 +5,9 @@ include('connection.php');
 // Check if email and password are set in POST request
 if (isset($_POST['email']) && isset($_POST['password'])) {
     $email = $_POST['email'];
-    $password = $_POST['password'];  // User-provided password
-    $hashedPassword = password_hash($password, PASSWORD_DEFAULT);  // Hash the password
+    $password = $_POST['password'];  // User-provided password (plain text)
 
-    // Store $hashedPassword in the database
-    $sql = "INSERT INTO login (UserEmail, UserPassword) VALUES ('$email', '$hashedPassword')";
-    mysqli_query($conn, $sql);
-
-
-    // Prevent SQL Injection by using prepared statements
+    // Use prepared statements to prevent SQL injection
     $stmt = $conn->prepare("SELECT userID, UserPassword FROM login WHERE UserEmail = ?");
     $stmt->bind_param("s", $email);
     $stmt->execute();
@@ -24,14 +18,14 @@ if (isset($_POST['email']) && isset($_POST['password'])) {
         $storedPassword = $row['UserPassword'];
         $userID = $row['userID'];
 
-        // Verify the password (assuming the password is hashed in the database)
-        if (password_verify($password, $storedPassword)) {
+        // Check if provided password matches stored password
+        if ($password === $storedPassword) {
             // Set session variables to track the logged-in user
             $_SESSION['userID'] = $userID;
             $_SESSION['email'] = $email;
 
-            // Redirect to the BankHome page
-            header("Location: BankHome.php");
+            // Redirect to the BankHome page upon successful login
+            header("Location: Bankhome.html");
             exit();
         } else {
             echo "<h1>Login failed. Invalid password.</h1>";

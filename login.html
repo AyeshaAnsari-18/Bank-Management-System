@@ -11,8 +11,9 @@
       <div class="title">
          <span id="formTitle">Login Form</span>
       </div>
+
       <!-- Login Form -->
-      <form action="authentication.php" method="POST">
+      <form id="loginForm" action="authentication.php" method="POST" style="display: block;" onsubmit="return validateLogin()">
          <div class="field">
             <input type="email" id="email" name="email" required placeholder=" ">
             <label>Email Address</label>
@@ -28,9 +29,7 @@
             </div>
          </div>
          <div class="field">
-            <a href="BankHome.php">
-               <input type="submit" value="Login">
-            </a>
+            <input type="submit" value="Login">
          </div>
          <div class="signup-link">
             Not a user? <a href="#" onclick="toggleForm('signup')">Signup now</a>
@@ -38,21 +37,21 @@
       </form>
 
       <!-- Signup Form -->
-      <form id="signupForm" action="#" style="display: none;">
+      <form id="signupForm" action="signup.php" method="POST" style="display: none;" onsubmit="return validateSignup()">
          <div class="field">
-            <input type="text" required placeholder=" ">
+            <input type="text" name="fullname" required placeholder=" ">
             <label>Full Name</label>
          </div>
          <div class="field">
-            <input type="email" required placeholder=" ">
+            <input type="email" name="signup_email" required placeholder=" ">
             <label>Email Address</label>
          </div>
          <div class="field">
-            <input type="password" required minlength="8" placeholder=" ">
+            <input type="password" name="signup_password" required minlength="8" placeholder=" ">
             <label>Password</label>
          </div>
          <div class="field">
-            <input type="password" required minlength="8" placeholder=" ">
+            <input type="password" name="confirm_password" required minlength="8" placeholder=" ">
             <label>Confirm Password</label>
          </div>
          <div class="field">
@@ -62,6 +61,7 @@
             Already a user? <a href="#" onclick="toggleForm('login')">Login now</a>
          </div>
       </form>
+
    </div>
 
    <script>
@@ -79,6 +79,29 @@
             signupForm.style.display = "none";
             formTitle.textContent = "Login Form";
          }
+      }
+
+      function validateLogin() {
+         // Simple client-side validation
+         const email = document.getElementById("email").value;
+         const password = document.getElementById("password").value;
+
+         if (email === "" || password === "") {
+            alert("Please fill in all fields.");
+            return false;
+         }
+         return true;
+      }
+
+      function validateSignup() {
+         const password = document.getElementsByName("signup_password")[0].value;
+         const confirmPassword = document.getElementsByName("confirm_password")[0].value;
+
+         if (password !== confirmPassword) {
+            alert("Passwords do not match.");
+            return false;
+         }
+         return true;
       }
    </script>
 </body>

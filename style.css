@@ -82,6 +82,9 @@ html,body{
     background-color: #2e844a;
 }
 
+#try p{
+    color: white;
+}
 #try:hover{
     background-color: #312626;
 }
