@@ -42,6 +42,11 @@ html,body{
     font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
 }
 
+.texts a{
+    text-decoration: none;
+    color: #032D60;
+}
+
 .texts:hover{
     color: rgb(38, 152, 212);
 }
