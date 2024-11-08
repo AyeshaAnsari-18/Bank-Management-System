@@ -1,43 +1,41 @@
 <?php
-    // Start the session to ensure access to session variables
-    session_start();
+session_start();
+include 'connection.php';
 
-    // Include the database connection file
-    include 'connection.php';
-
-    // Check if the user is logged in (i.e., if session contains userID)
-    if (!isset($_SESSION['userID'])) {
-    // Redirect to login page if not logged in
+// Check if the user is logged in
+if (!isset($_SESSION['userID'])) {
     header("Location: login.html");
     exit();
-    }
+}
 
-    // Get customerID from the session
-    $customerID = $_SESSION['userID'];
+// Regenerate session ID to prevent session fixation
+session_regenerate_id();
 
-    // Fetch user information
-    $sql_user = "SELECT name FROM customer WHERE customerID = ?";
-    $stmt_user = $conn->prepare($sql_user);
-    $stmt_user->bind_param("i", $customerID);
-    $stmt_user->execute();
-    $result_user = $stmt_user->get_result();
-    $user = $result_user->fetch_assoc();
+// Get customerID from the session
+$customerID = $_SESSION['userID'];
 
-    // Fetch account information
-    $sql_account = "SELECT AccountType, Balance, AccountID FROM account WHERE customer_customerID = ?";
-    $stmt_account = $conn->prepare($sql_account);
-    $stmt_account->bind_param("i", $customerID);
-    $stmt_account->execute();
-    $result_account = $stmt_account->get_result();
-    $account = $result_account->fetch_assoc();
+// Fetch user information
+$sql_user = "SELECT name FROM customer WHERE customerID = ?";
+$stmt_user = $conn->prepare($sql_user);
+$stmt_user->bind_param("i", $customerID);
+$stmt_user->execute();
+$result_user = $stmt_user->get_result();
+$user = $result_user->fetch_assoc();
 
-    // Fetch recent transactions (limit to last 5 for display purposes)
-    $sql_transactions = "SELECT transactionDate, Type, amount FROM transaction WHERE account_AccountID = ? ORDER BY transactionDate DESC LIMIT 5";
-    $stmt_transactions = $conn->prepare($sql_transactions);
-    $stmt_transactions->bind_param("i", $account['AccountID']);
-    $stmt_transactions->execute();
-    $result_transactions = $stmt_transactions->get_result();
+// Fetch account information
+$sql_account = "SELECT AccountType, Balance, AccountID FROM account WHERE customer_customerID = ?";
+$stmt_account = $conn->prepare($sql_account);
+$stmt_account->bind_param("i", $customerID);
+$stmt_account->execute();
+$result_account = $stmt_account->get_result();
+$account = $result_account->fetch_assoc();
 
+// Fetch recent transactions (limit to last 5)
+$sql_transactions = "SELECT transactionDate, Type, amount FROM transaction WHERE account_AccountID = ? ORDER BY transactionDate DESC LIMIT 5";
+$stmt_transactions = $conn->prepare($sql_transactions);
+$stmt_transactions->bind_param("i", $account['AccountID']);
+$stmt_transactions->execute();
+$result_transactions = $stmt_transactions->get_result();
 ?>
 
 <!DOCTYPE html>
@@ -61,7 +59,7 @@
             <img src="logo.png" width="75px" alt="Bank Logo">
         </div>
 
-        <!-- Navigation Links for User Functionalities -->
+        <!-- Navigation Links -->
         <nav class="nav-links">
             <a href="#dashboard">Dashboard</a>
             <a href="#accounts">Accounts</a>
@@ -70,10 +68,10 @@
             <a href="#statements">Statements</a>
             <a href="#support">Support</a>
             <a href="#profile">Profile</a>
-            <a href="logout.php">Logout</a> <!-- Changed to a separate logout.php -->
+            <a href="logout.php">Logout</a>
         </nav>
 
-        <!-- Search Bar Icon and Notification Icon -->
+        <!-- Icons -->
         <div class="icon-group">
             <div class="icon"><i class="ri-search-line"></i></div>
             <div class="icon"><i class="ri-notification-3-line"></i></div>
@@ -82,9 +80,7 @@
 
     <!-- User Info Section -->
     <div class="user-info">
-        <!-- Display User's Name -->
         <h1>Welcome, <?php echo htmlspecialchars($user['name']); ?></h1>
-        <!-- Customizing the Account Overview based on User Data -->
         <p><?php echo htmlspecialchars($user['name']); ?>'s Account Overview</p>
 
         <!-- Account Details -->
