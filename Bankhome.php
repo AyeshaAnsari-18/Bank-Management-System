@@ -3,7 +3,7 @@ session_start();
 include 'connection.php';
 
 // Check if the user is logged in
-if (!isset($_SESSION['userID'])) {
+if (!isset($_SESSION['customerId'])) {
     header("Location: login.html");
     exit();
 }
@@ -12,12 +12,12 @@ if (!isset($_SESSION['userID'])) {
 session_regenerate_id();
 
 // Get customerID from the session
-$customerID = $_SESSION['userID'];
+$customerID = $_SESSION['customerId'];
 
 // Fetch user information
-$sql_user = "SELECT name FROM customer WHERE customerID = ?";
+$sql_user = "SELECT Name FROM Customer WHERE CustomerId = ?";
 $stmt_user = $conn->prepare($sql_user);
-$stmt_user->bind_param("i", $customerID);
+$stmt_user->bind_param("s", $customerID);
 $stmt_user->execute();
 $result_user = $stmt_user->get_result();
 $user = $result_user->fetch_assoc();
@@ -25,13 +25,13 @@ $user = $result_user->fetch_assoc();
 // Fetch account information
 $sql_account = "SELECT AccountType, Balance, AccountID FROM account WHERE customer_customerID = ?";
 $stmt_account = $conn->prepare($sql_account);
-$stmt_account->bind_param("i", $customerID);
+$stmt_account->bind_param("s", $customerID);
 $stmt_account->execute();
 $result_account = $stmt_account->get_result();
 $account = $result_account->fetch_assoc();
 
-// Fetch recent transactions (limit to last 5)
-$sql_transactions = "SELECT transactionDate, Type, amount FROM transaction WHERE account_AccountID = ? ORDER BY transactionDate DESC LIMIT 5";
+//Fetch recent transactions (limit to last 5)
+$sql_transactions = "SELECT transactionDate, transactionType, transactionAmount FROM transaction WHERE account_AccountID = ? ORDER BY transactionDate DESC LIMIT 5";
 $stmt_transactions = $conn->prepare($sql_transactions);
 $stmt_transactions->bind_param("i", $account['AccountID']);
 $stmt_transactions->execute();
@@ -47,6 +47,7 @@ $result_transactions = $stmt_transactions->get_result();
     <link rel="stylesheet" href="BankHome.css">
     <link href="https://cdn.jsdelivr.net/npm/remixicon@4.3.0/fonts/remixicon.css" rel="stylesheet"/>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+
 </head>
 <body>
 
@@ -80,10 +81,11 @@ $result_transactions = $stmt_transactions->get_result();
 
     <!-- User Info Section -->
     <div class="user-info">
-        <h1>Welcome, <?php echo htmlspecialchars($user['name']); ?></h1>
-        <p><?php echo htmlspecialchars($user['name']); ?>'s Account Overview</p>
+        <h1>Welcome, <?php echo htmlspecialchars($user['Name']); ?></h1>
+        <p><?php echo htmlspecialchars($user['Name']); ?>'s Account Overview</p>
 
         <!-- Account Details -->
+
         <div class="account-details">
             <div class="detail-card">
                 <h2>Account Balance</h2>
@@ -91,7 +93,7 @@ $result_transactions = $stmt_transactions->get_result();
             </div>
             <div class="detail-card">
                 <h2>Account Number</h2>
-                <p>XXXX-XXXX-XXXX-<?php echo substr($account['AccountID'], -4); ?></p>
+                <p><?php echo substr($account['AccountID'], -4); ?></p>
             </div>
             <div class="detail-card">
                 <h2>Account Type</h2>
@@ -125,8 +127,8 @@ $result_transactions = $stmt_transactions->get_result();
                     <?php while($transaction = $result_transactions->fetch_assoc()): ?>
                     <tr>
                         <td><?php echo date("F j, Y", strtotime($transaction['transactionDate'])); ?></td>
-                        <td><?php echo htmlspecialchars($transaction['Type']); ?></td>
-                        <td><?php echo ($transaction['Type'] == "Debit" ? "-" : "+") . "$" . number_format($transaction['amount'], 2); ?></td>
+                        <td><?php echo htmlspecialchars($transaction['transactionType']); ?></td>
+                        <td><?php echo ($transaction['transactionType'] == "Debit" ? "-" : "+") . "$" . number_format($transaction['transactionAmount'], 2); ?></td>
                     </tr>
                     <?php endwhile; ?>
                 </tbody>

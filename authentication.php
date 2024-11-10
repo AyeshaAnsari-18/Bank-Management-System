@@ -24,7 +24,7 @@ if (isset($_POST['customer_id']) && isset($_POST['password'])) {
             $_SESSION['customerId'] = $customerId;
 
             // Redirect to the BankHome page upon successful login
-            header("Location: Bankhome.html");
+            header("Location: Bankhome.php");
             exit();
         } else {
             // Incorrect password, redirect to login with error message
