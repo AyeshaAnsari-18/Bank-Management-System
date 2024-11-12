@@ -1,10 +1,10 @@
 <?php
 session_start();
-include 'connection.php';
+include '../connection.php';
 
 // Check if the user is logged in
 if (!isset($_SESSION['customerId'])) {
-    header("Location: login.html");
+    header("Location: ../login.html");
     exit();
 }
 
@@ -22,7 +22,6 @@ $stmt_user->execute();
 $result_user = $stmt_user->get_result();
 $user = $result_user->fetch_assoc();
 
-// Fetch account information
 $sql_account = "SELECT AccountType, Balance, AccountID FROM account WHERE customer_customerID = ?";
 $stmt_account = $conn->prepare($sql_account);
 $stmt_account->bind_param("s", $customerID);
@@ -30,6 +29,12 @@ $stmt_account->execute();
 $result_account = $stmt_account->get_result();
 $account = $result_account->fetch_assoc();
 
+//Fetch recent transactions (limit to last 5)
+$sql_transactions = "SELECT transactionDate, transactionType, transactionAmount FROM transaction WHERE account_AccountID = ? ORDER BY transactionDate DESC LIMIT 5";
+$stmt_transactions = $conn->prepare($sql_transactions);
+$stmt_transactions->bind_param("i", $account['AccountID']);
+$stmt_transactions->execute();
+$result_transactions = $stmt_transactions->get_result();
 ?>
 
 <!DOCTYPE html>
@@ -37,8 +42,8 @@ $account = $result_account->fetch_assoc();
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>User Dashboard</title>
-    <link rel="stylesheet" href="BankHome.css">
+    <title>Transaction</title>
+    <link rel="stylesheet" href="../BankHome.css">
     <link href="https://cdn.jsdelivr.net/npm/remixicon@4.3.0/fonts/remixicon.css" rel="stylesheet"/>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
 
@@ -51,18 +56,18 @@ $account = $result_account->fetch_assoc();
     <header id="header">
         <!-- Bank Logo -->
         <div id="logo">
-            <img src="logo.png" width="75px" alt="Bank Logo">
+            <img src="../logo.png" width="75px" alt="Bank Logo">
         </div>
 
         <!-- Navigation Links -->
         <nav class="nav-links">
-            <a href="Bankhome.php">Accounts</a>
-            <a href="Bankpages/Bank_transaction.php">Transaction</a>
-            <a href="Bankpages/Bank_pay.php">Pay</a>
-            <a href="Bankpages/Bank_loan.php">Loans</a>
-            <a href="Bankpages/Bank_stats.php">Statements</a>
-            <a href="Bankpages/Bank_support.php">Support</a>
-            <a href="Bankpages/">Profile</a>
+            <a href="../Bankhome.php">Accounts</a>
+            <a href="Bank_transaction.php">Transaction</a>
+            <a href="Bank_pay.php">Pay</a>
+            <a href="#loans">Loans</a>
+            <a href="#statements">Statements</a>
+            <a href="#support">Support</a>
+            <a href="#profile">Profile</a>
             <a href="login.html">Logout</a>
         </nav>
 
@@ -78,35 +83,29 @@ $account = $result_account->fetch_assoc();
         <h1>Welcome, <?php echo htmlspecialchars($user['Name']); ?></h1>
         <p><?php echo htmlspecialchars($user['Name']); ?>'s Account Overview</p>
 
-        <!-- Account Details -->
-
-        <div class="account-details">
-            <div class="detail-card">
-                <h2>Account Balance</h2>
-                <p>$<?php echo number_format($account['Balance'], 2); ?></p>
-            </div>
-            <div class="detail-card">
-                <h2>Account Number</h2>
-                <p><?php echo substr($account['AccountID'], -4); ?></p>
-            </div>
-            <div class="detail-card">
-                <h2>Account Type</h2>
-                <p><?php echo htmlspecialchars($account['AccountType']); ?></p>
-            </div>
-            <div class="detail-card">
-                <h2>Last Login</h2>
-                <p id="lastLogin">Loading...</p>
-            </div>
+       
+        <!-- Recent Transactions Section -->
+        <div class="transactions">
+            <h2>Recent Transactions</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Description</th>
+                        <th>Amount</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php while($transaction = $result_transactions->fetch_assoc()): ?>
+                    <tr>
+                        <td><?php echo date("F j, Y", strtotime($transaction['transactionDate'])); ?></td>
+                        <td><?php echo htmlspecialchars($transaction['transactionType']); ?></td>
+                        <td><?php echo ($transaction['transactionType'] == "Debit" ? "-" : "+") . "$" . number_format($transaction['transactionAmount'], 2); ?></td>
+                    </tr>
+                    <?php endwhile; ?>
+                </tbody>
+            </table>
         </div>
-
-        <script>
-        // Display current date and time for "Last Login"
-        const now = new Date();
-        const options = { year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric' };
-        document.getElementById('lastLogin').textContent = now.toLocaleString('en-US', options);
-        </script>
-
-        
     </div>
 </div>
 
