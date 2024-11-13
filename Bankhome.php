@@ -86,7 +86,7 @@ $account = $result_account->fetch_assoc();
                 <p>$<?php echo number_format($account['Balance'], 2); ?></p>
             </div>
             <div class="detail-card">
-                <h2>Account Number</h2>
+                <h2>Account Id</h2>
                 <p><?php echo substr($account['AccountID'], -4); ?></p>
             </div>
             <div class="detail-card">
