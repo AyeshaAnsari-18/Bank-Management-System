@@ -30,7 +30,7 @@ $result_account = $stmt_account->get_result();
 $account = $result_account->fetch_assoc();
 
 //Fetch recent transactions (limit to last 5)
-$sql_transactions = "SELECT transactionDate, transactionType, transactionAmount FROM transaction WHERE account_AccountID = ? ORDER BY transactionDate DESC LIMIT 5";
+$sql_transactions = "SELECT transactionDate, transactionType, transactionAmount FROM transaction WHERE account_AccountID = ? ORDER BY transactionDate DESC LIMIT 6";
 $stmt_transactions = $conn->prepare($sql_transactions);
 $stmt_transactions->bind_param("i", $account['AccountID']);
 $stmt_transactions->execute();
