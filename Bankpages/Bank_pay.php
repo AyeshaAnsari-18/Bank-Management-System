@@ -1,7 +1,7 @@
 <?php
 session_start();
 include '../connection.php';
-$message = '';
+
 // Check if the user is logged in
 if (!isset($_SESSION['customerId'])) {
     header("Location: ../login.html");
@@ -13,98 +13,100 @@ session_regenerate_id();
 
 // Get customerID from the session
 $customerID = $_SESSION['customerId'];
-$sql_account = "SELECT AccountID, Balance FROM account WHERE customer_customerID = ?";
+
+// Fetch user information
+$sql_user = "SELECT Name, account_accountID FROM Customer WHERE CustomerId = ?";
+$stmt_user = $conn->prepare($sql_user);
+$stmt_user->bind_param("s", $customerID);
+$stmt_user->execute();
+$result_user = $stmt_user->get_result();
+$user = $result_user->fetch_assoc();
+$stmt_user->close();
+
+if (!$user) {
+    echo "<p style='color: red;'>User not found.</p>";
+    exit();
+}
+
+// Fetch account information
+$accountID = $user['account_accountID'];
+$sql_account = "SELECT AccountType, Balance, AccountID FROM account WHERE AccountID = ?";
 $stmt_account = $conn->prepare($sql_account);
-$stmt_account->bind_param("i", $customerID);
+$stmt_account->bind_param("s", $accountID);
 $stmt_account->execute();
 $result_account = $stmt_account->get_result();
 $account = $result_account->fetch_assoc();
+$stmt_account->close();
 
-$sender_account_id = $account['AccountID'];
-$sender_balance = $account['Balance'];
+if (!$account) {
+    echo "<p style='color: red;'>Account information not found.</p>";
+    exit();
+}
 
-// Check if the form was submitted
+// Initialize message variable
+$message = '';
+
+// Handle fund transfer submission
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    
-    // Retrieve and validate transfer details from POST
-    $sender_accountinput = (int) $_POST['sender_account'];
+    $receiver_account = trim($_POST['receiver_account']);
+    $amount = (float)trim($_POST['amount']);
 
-    if($sender_accountinput == $sender_account_id){
-        $receiver_account = $_POST['receiver_account'];
-        $amount = (double)$_POST['amount'];
-    
-        // Validate form data
-        if ($amount <= 0) {
-            $message = "<p style='color: red; text-align: center;'>Please enter a valid amount.</p>";
-            exit();
-        }
-    
-        // Check if the sender has enough balance
-        if ($sender_balance < $amount) {
-            $message = "<p style='color: red; text-align: center;'>Insufficient funds in the sender's account.</p>";
-            exit();
-        }
-    
-        // Start transaction
+    // Validate inputs
+    if (empty($receiver_account) || $amount <= 0) {
+        $message = "<p style='color: red;'>Please fill in all fields correctly.</p>";
+    } elseif ($account['Balance'] < $amount) {
+        $message = "<p style='color: red;'>Insufficient funds in your account.</p>";
+    } elseif ($receiver_account === $accountID) {
+        $message = "<p style='color: red;'>You cannot transfer funds to your own account.</p>";
+    } else {
+        // Begin transaction
         $conn->begin_transaction();
-    
         try {
-            // Fetch receiver's account details
-            $sql_receiver = "SELECT AccountID,Balance FROM account WHERE AccountID = ?";
+            // Check if receiver account exists
+            $sql_receiver = "SELECT AccountID FROM account WHERE AccountID = ?";
             $stmt_receiver = $conn->prepare($sql_receiver);
-            $stmt_receiver->bind_param("i", $receiver_account);
+            $stmt_receiver->bind_param("s", $receiver_account);
             $stmt_receiver->execute();
-            $result_receiver = $stmt_receiver->get_result();
-            $receiver = $result_receiver->fetch_assoc();
-    
+            $receiver = $stmt_receiver->get_result()->fetch_assoc();
+            $stmt_receiver->close();
+
             if (!$receiver) {
-                $message = "<p style='color: red; text-align: center;'>Receiver account not found.</p>";
                 throw new Exception("Receiver account not found.");
             }
-    
-            $receiver_account_id = $receiver['AccountID'];
-            
-    
-            // Deduct amount from sender's account
-            $sql_deduct = "UPDATE account SET Balance = Balance - ? WHERE AccountID = ?";
-            $stmt_deduct = $conn->prepare($sql_deduct);
-            $stmt_deduct->bind_param("di", $amount, $sender_account_id);
-            $stmt_deduct->execute();
-    
-            // Add amount to receiver's account
-            $sql_add = "UPDATE account SET Balance = Balance + ? WHERE AccountID = ?";
-            $stmt_add = $conn->prepare($sql_add);
-            $stmt_add->bind_param("di", $amount, $receiver_account_id);
-            $stmt_add->execute();
-    
-            // Record the transaction for the sender (debit)
+
+            // Update sender's account balance
+            $sql_update_sender = "UPDATE account SET Balance = Balance - ? WHERE AccountID = ?";
+            $stmt_update_sender = $conn->prepare($sql_update_sender);
+            $stmt_update_sender->bind_param("ds", $amount, $accountID);
+            $stmt_update_sender->execute();
+
+            // Update receiver's account balance
+            $sql_update_receiver = "UPDATE account SET Balance = Balance + ? WHERE AccountID = ?";
+            $stmt_update_receiver = $conn->prepare($sql_update_receiver);
+            $stmt_update_receiver->bind_param("ds", $amount, $receiver_account);
+            $stmt_update_receiver->execute();
+
+            // Log transactions
             $sql_transaction_sender = "INSERT INTO transaction (transactionAmount, transactiondate, transactiontype, account_AccountID) VALUES (?, NOW(), 'debit', ?)";
             $stmt_transaction_sender = $conn->prepare($sql_transaction_sender);
-            $stmt_transaction_sender->bind_param("di", $amount, $sender_account_id);
+            $stmt_transaction_sender->bind_param("ds", $amount, $accountID);
             $stmt_transaction_sender->execute();
-    
-            // Record the transaction for the receiver (credit)
+
             $sql_transaction_receiver = "INSERT INTO transaction (transactionAmount, transactiondate, transactiontype, account_AccountID) VALUES (?, NOW(), 'credit', ?)";
             $stmt_transaction_receiver = $conn->prepare($sql_transaction_receiver);
-            $stmt_transaction_receiver->bind_param("di", $amount, $receiver_account_id);
+            $stmt_transaction_receiver->bind_param("ds", $amount, $receiver_account);
             $stmt_transaction_receiver->execute();
-    
-            // Commit the transaction
+
+            // Commit transaction
             $conn->commit();
-            $message = "<p style='color: green; text-align: center;'>Funds transferred successfully!</p>";
-            
-        } 
-        catch (Exception $e) {
-            // Rollback transaction if any error occurs
+            $message = "<p style='color: green;'>Funds transferred successfully!</p>";
+        } catch (Exception $e) {
+            // Rollback transaction on error
             $conn->rollback();
-            $message= "<p style='color: red; text-align: center;'>Error: " . $e->getMessage() . "</p>";
+            $message = "<p style='color: red;'>Transaction failed: " . htmlspecialchars($e->getMessage()) . "</p>";
         }
     }
-    else{
-        $message = "<p style='color: red; text-align: center;'>Wrong sender account id.</p>";
-    }
 }
-$conn->close();
 ?>
 
 <!DOCTYPE html>
@@ -116,90 +118,13 @@ $conn->close();
     <link rel="stylesheet" href="../BankHome.css">
     <link href="https://cdn.jsdelivr.net/npm/remixicon@4.3.0/fonts/remixicon.css" rel="stylesheet"/>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
-    <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: Arial, sans-serif;
-        }
-
-        body {
-            background-color: #f2f2f2;
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-            justify-content: space-between;
-        }
-        
-        .transfer-form-container {
-            background-color: #ffffff;
-            border-radius: 10px;
-            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
-            max-width: 400px;
-            width: 100%;
-            padding: 20px;
-            margin: 20px auto;
-        }
-
-        .transfer-form-container h2 {
-            color: #333;
-            text-align: center;
-            margin-bottom: 20px;
-            font-size: 22px;
-        }
-
-        .transfer-form-container label {
-            font-size: 14px;
-            color: #555;
-            display: block;
-            margin-bottom: 5px;
-        }
-
-        .transfer-form-container input[type="text"],
-        .transfer-form-container input[type="number"],
-        .transfer-form-container textarea {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            margin-bottom: 15px;
-            font-size: 14px;
-        }
-
-        .transfer-form-container textarea {
-            resize: vertical;
-            min-height: 80px;
-        }
-
-        .transfer-form-container button {
-            background-color: #002855;
-            color: white;
-            font-size: 16px;
-            padding: 10px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            width: 100%;
-        }
-
-        .transfer-form-container button:hover {
-            background-color: #001a3b;
-        }
-    </style>
 </head>
 <body>
-
-<!-- Main container -->
 <div id="main">
-    <!-- Header Section -->
     <header id="header">
-        <!-- Bank Logo -->
         <div id="logo">
             <img src="../logo.png" width="75px" alt="Bank Logo">
         </div>
-
-        <!-- Navigation Links -->
         <nav class="nav-links">
             <a href="../Bankhome.php">Accounts</a>
             <a href="Bank_transaction.php">Transaction</a>
@@ -210,43 +135,32 @@ $conn->close();
             <a href="Bank_profile.php">Profile</a>
             <a href="../login.html">Logout</a>
         </nav>
-
-        <!-- Icons -->
         <div class="icon-group">
             <div class="icon"><i class="ri-search-line"></i></div>
             <div class="icon"><i class="ri-notification-3-line"></i></div>
         </div>
     </header>
+
+    <div class="user-info">
+        <h1>Welcome, <?php echo htmlspecialchars($user['Name']); ?></h1>
+        <p>Account Balance: $<?php echo number_format($account['Balance'], 2); ?></p>
+        <div class="transfer-form">
+            <h2>Transfer Funds</h2>
+            <?php if ($message) echo "<div class='message'>$message</div>"; ?>
+            <form method="POST">
+                <label for="receiver-account">Receiver's Account:</label>
+                <input type="text" id="receiver-account" name="receiver_account" required>
+                <label for="amount">Amount:</label>
+                <input type="number" id="amount" name="amount" min="0.01" step="0.01" required>
+                <button type="submit">Transfer</button>
+            </form>
+        </div>
+    </div>
 </div>
-
-<!-- Display the message here -->
-<?php echo $message; ?>
-
-    <div class="transfer-form-container">
-        <h2>Funds Transfer</h2>
-        <form action="#" method="POST">
-            <label for="sender-account">Sender's Account Number</label>
-            <input type="text" id="sender-account" name="sender_account" required>
-
-            <label for="receiver-account">Receiver's Account Number</label>
-            <input type="text" id="receiver-account" name="receiver_account" required>
-
-            <label for="amount">Amount</label>
-            <input type="number" id="amount" name="amount" required min="1" step="0.01">
-
-            <button type="submit">Transfer Funds</button>
-        </form>
-    </div>
-
-<!-- Footer Section -->
 <footer id="footer">
-    <div class="footer-content">
-        <p>© Copyright 2024 Aegis, Inc. <u>All rights reserved.</u> Various trademarks held by their respective owners.</p>
-    </div>
+    <p>&copy; 2024 Aegis, Inc. All rights reserved.</p>
 </footer>
-
 </body>
 </html>
 
-<?php 
-?>
+<?php $conn->close(); ?>

@@ -15,12 +15,9 @@
 <div id="main">
     <!-- Header Section -->
     <header id="header">
-        <!-- Bank Logo -->
         <div id="logo">
             <img src="../logo.png" width="75px" alt="Bank Logo">
         </div>
-
-        <!-- Navigation Links -->
         <nav class="nav-links">
             <a href="../Bankhome.php">Accounts</a>
             <a href="Bank_transaction.php">Transaction</a>
@@ -31,8 +28,6 @@
             <a href="Bank_profile.php">Profile</a>
             <a href="../login.html">Logout</a>
         </nav>
-
-        <!-- Icons -->
         <div class="icon-group">
             <div class="icon"><i class="ri-search-line"></i></div>
             <div class="icon"><i class="ri-notification-3-line"></i></div>
@@ -50,8 +45,3 @@
 
 </body>
 </html>
-
-<?php
-// Close the database connection
-$conn->close();
-?>

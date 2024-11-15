@@ -22,7 +22,7 @@
       <div id="errorMessage" class="error-message" style="display: none; color: red; text-align: center;"></div>
 
       <!-- Login Form -->
-      <form id="loginForm" action="authentication.php" method="POST" style="display: block;" onsubmit="return validateLogin()">
+      <form id="loginForm" style="display: block;">
          <div class="field">
             <input type="text" id="customer_id" name="customer_id" required placeholder=" ">
             <label for="customer_id">Customer ID</label>
@@ -68,6 +68,10 @@
             <label for="phone">Phone Number</label>
          </div>
          <div class="field">
+            <input type="text" name="account_id" required placeholder=" ">
+            <label for="account_id">Account ID</label>
+         </div>
+         <div class="field">
             <input type="password" name="signup_password" required minlength="8" placeholder=" ">
             <label for="signup_password">Password</label>
          </div>
@@ -102,6 +106,7 @@
             const errorMessages = {
                incorrect_password: "Incorrect password. Please try again.",
                invalid_customer_id: "Invalid Customer ID. Please try again.",
+               invalid_account_id: "Invalid Account ID. Please check and try again.",  // New error message
                missing_fields: "Please fill in all required fields.",
                email_exists: "Email already exists. Please use a different email address.",
                password_mismatch: "Passwords do not match.",
@@ -111,7 +116,7 @@
             };
             errorMessage.textContent = errorMessages[error] || "An unknown error occurred.";
 
-            const signupErrors = ["email_exists", "password_mismatch", "registration_failed", "email_not_sent"];
+            const signupErrors = ["email_exists", "password_mismatch", "registration_failed", "invalid_account_id", "email_not_sent"];
             if (signupErrors.includes(error)) {
                toggleForm('signup'); // Show the signup form with error message
             }
@@ -134,16 +139,38 @@
          }
       }
 
-      function validateLogin() {
+      // Handle Login Form Submission
+      document.getElementById("loginForm").addEventListener("submit", async function (e) {
+         e.preventDefault(); // Prevent default form submission
+
          const customerId = document.getElementById("customer_id").value.trim();
          const password = document.getElementById("password").value.trim();
 
-         if (customerId === "" || password === "") {
+         if (!customerId || !password) {
             alert("Please fill in all fields.");
-            return false;
+            return;
          }
-         return true;
-      }
+
+         try {
+            const response = await fetch('api/login_api.php', {
+               method: 'POST',
+               headers: { 'Content-Type': 'application/json' },
+               body: JSON.stringify({ customer_id: customerId, password: password })
+            });
+
+            const result = await response.json();
+
+            if (result.status === 'success') {
+               alert("Login successful!");
+               window.location.href = "../Bankhome.php"; // Redirect to homepage or dashboard
+            } else {
+               alert(result.message);
+            }
+         } catch (error) {
+            console.error("Error:", error);
+            alert("An error occurred. Please try again.");
+         }
+      });
 
       function validateSignup() {
          const name = document.querySelector("[name='name']").value.trim();
@@ -151,10 +178,11 @@
          const address = document.querySelector("[name='address']").value.trim();
          const dob = document.querySelector("[name='dob']").value;
          const phone = document.querySelector("[name='phone']").value.trim();
+         const accountId = document.querySelector("[name='account_id']").value.trim();
          const password = document.querySelector("[name='signup_password']").value;
          const confirmPassword = document.querySelector("[name='confirm_password']").value;
 
-         if (!name || !email || !address || !dob || !phone || !password || !confirmPassword) {
+         if (!name || !email || !address || !dob || !phone || !accountId || !password || !confirmPassword) {
             alert("Please fill in all required fields.");
             return false;
          }
