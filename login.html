@@ -1,9 +1,9 @@
-<!DOCTYPE html> 
+<!DOCTYPE html>
 <html lang="en">
 <head>
    <meta charset="UTF-8">
    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-   <title>Form</title>
+   <title>Login and Signup Form</title>
    <link rel="stylesheet" href="formstyle.css">
 </head>
 <body>
@@ -13,26 +13,23 @@
       </div>
 
       <!-- Success Message -->
-      <div id="successMessage" class="success-message" style="display: none;">
-         Registration successful! You can now log in with your Customer ID and password.
+      <div id="successMessage" class="success-message" style="display: none; color: green; text-align: center;">
+         <h1>Registration Successful!</h1>
+         <p>Registration successful! Your Customer ID has been sent to your email. Use it to log in.</p>
       </div>
 
-      <!-- Error Message for Incorrect Password or Invalid Customer ID -->
-      <div id="errorMessage" class="error-message" style="display: none; color: red;"></div>
+      <!-- Error Message for Signup or Login -->
+      <div id="errorMessage" class="error-message" style="display: none; color: red; text-align: center;"></div>
 
       <!-- Login Form -->
       <form id="loginForm" action="authentication.php" method="POST" style="display: block;" onsubmit="return validateLogin()">
          <div class="field">
             <input type="text" id="customer_id" name="customer_id" required placeholder=" ">
-            <label>Customer ID</label>
-         </div>
-         <div class="field">
-            <input type="email" id="email" name="email" required placeholder=" ">
-            <label>Email Address</label>
+            <label for="customer_id">Customer ID</label>
          </div>
          <div class="field">
             <input type="password" id="password" name="password" required minlength="8" placeholder=" ">
-            <label>Password</label>
+            <label for="password">Password</label>
          </div>
          <div class="content">
             <div class="checkbox">
@@ -51,36 +48,32 @@
       <!-- Signup Form -->
       <form id="signupForm" action="signup.php" method="POST" style="display: none;" onsubmit="return validateSignup()">
          <div class="field">
-            <input type="text" name="customer_id" required placeholder=" ">
-            <label>Customer ID</label>
-         </div>
-         <div class="field">
             <input type="text" name="name" required placeholder=" ">
-            <label>Full Name</label>
+            <label for="name">Full Name</label>
          </div>
          <div class="field">
             <input type="email" name="email" required placeholder=" ">
-            <label>Email Address</label>
+            <label for="email">Email Address</label>
          </div>
          <div class="field">
             <input type="text" name="address" required placeholder=" ">
-            <label>Address</label>
+            <label for="address">Address</label>
          </div>
          <div class="field">
             <input type="date" name="dob" required placeholder=" ">
-            <label>Date of Birth</label>
+            <label for="dob">Date of Birth</label>
          </div>
          <div class="field">
             <input type="tel" name="phone" required placeholder=" ">
-            <label>Phone Number</label>
+            <label for="phone">Phone Number</label>
          </div>
          <div class="field">
             <input type="password" name="signup_password" required minlength="8" placeholder=" ">
-            <label>Password</label>
+            <label for="signup_password">Password</label>
          </div>
          <div class="field">
             <input type="password" name="confirm_password" required minlength="8" placeholder=" ">
-            <label>Confirm Password</label>
+            <label for="confirm_password">Confirm Password</label>
          </div>
          <div class="field">
             <input type="submit" value="Signup">
@@ -89,31 +82,38 @@
             Already a user? <a href="#" onclick="toggleForm('login')">Login now</a>
          </div>
       </form>
-
    </div>
 
    <script>
-      // Check URL for success or error message
+      // Display success or error message based on URL parameters
       window.onload = function() {
          const urlParams = new URLSearchParams(window.location.search);
          const successMessage = document.getElementById("successMessage");
          const errorMessage = document.getElementById("errorMessage");
 
-         // Display success message if user has just registered
          if (urlParams.get("success") === "1") {
             successMessage.style.display = "block";
+            toggleForm('login'); // Show the login form with success message
          }
 
-         // Display appropriate error messages based on the URL parameter
          const error = urlParams.get("error");
          if (error) {
             errorMessage.style.display = "block";
-            if (error === "incorrect_password") {
-               errorMessage.textContent = "Incorrect password. Please try again.";
-            } else if (error === "invalid_customer_id") {
-               errorMessage.textContent = "Invalid Customer ID. Please try again.";
-            } else if (error === "missing_fields") {
-               errorMessage.textContent = "Please enter both Customer ID and password.";
+            const errorMessages = {
+               incorrect_password: "Incorrect password. Please try again.",
+               invalid_customer_id: "Invalid Customer ID. Please try again.",
+               missing_fields: "Please fill in all required fields.",
+               email_exists: "Email already exists. Please use a different email address.",
+               password_mismatch: "Passwords do not match.",
+               registration_failed: "Registration failed. Please try again.",
+               email_not_sent: "Account created, but we couldn't send the email. Please try again later.",
+               database_error: "A database error occurred. Please try again later."
+            };
+            errorMessage.textContent = errorMessages[error] || "An unknown error occurred.";
+
+            const signupErrors = ["email_exists", "password_mismatch", "registration_failed", "email_not_sent"];
+            if (signupErrors.includes(error)) {
+               toggleForm('signup'); // Show the signup form with error message
             }
          }
       };
@@ -135,11 +135,10 @@
       }
 
       function validateLogin() {
-         const customerId = document.getElementById("customer_id").value;
-         const email = document.getElementById("email").value;
-         const password = document.getElementById("password").value;
+         const customerId = document.getElementById("customer_id").value.trim();
+         const password = document.getElementById("password").value.trim();
 
-         if (customerId === "" || email === "" || password === "") {
+         if (customerId === "" || password === "") {
             alert("Please fill in all fields.");
             return false;
          }
@@ -147,16 +146,15 @@
       }
 
       function validateSignup() {
-         const customerId = document.querySelector("[name='customer_id']").value;
-         const name = document.querySelector("[name='name']").value;
-         const email = document.querySelector("[name='email']").value;
-         const address = document.querySelector("[name='address']").value;
+         const name = document.querySelector("[name='name']").value.trim();
+         const email = document.querySelector("[name='email']").value.trim();
+         const address = document.querySelector("[name='address']").value.trim();
          const dob = document.querySelector("[name='dob']").value;
-         const phone = document.querySelector("[name='phone']").value;
+         const phone = document.querySelector("[name='phone']").value.trim();
          const password = document.querySelector("[name='signup_password']").value;
          const confirmPassword = document.querySelector("[name='confirm_password']").value;
 
-         if (!customerId || !name || !email || !address || !dob || !phone || !password || !confirmPassword) {
+         if (!name || !email || !address || !dob || !phone || !password || !confirmPassword) {
             alert("Please fill in all required fields.");
             return false;
          }
