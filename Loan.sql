@@ -9,3 +9,4 @@ CREATE TABLE Loan (
     EndDate DATE NOT NULL,
     FOREIGN KEY (CustomerId) REFERENCES Customer(CustomerId)
 );
+jubjhrtppgotstfp
