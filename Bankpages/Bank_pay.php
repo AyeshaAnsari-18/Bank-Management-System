@@ -10,11 +10,12 @@ if (!isset($_SESSION['customerId'])) {
 
 // Regenerate session ID to prevent session fixation
 session_regenerate_id();
+
 // Get customerID from the session
 $customerID = $_SESSION['customerId'];
 $sql_account = "SELECT AccountID, Balance FROM account WHERE customer_customerID = ?";
 $stmt_account = $conn->prepare($sql_account);
-$stmt_account->bind_param("s", $customerID);
+$stmt_account->bind_param("i", $customerID);
 $stmt_account->execute();
 $result_account = $stmt_account->get_result();
 $account = $result_account->fetch_assoc();
@@ -30,17 +31,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     if($sender_accountinput == $sender_account_id){
         $receiver_account = $_POST['receiver_account'];
-        $amount = (int)$_POST['amount'];
+        $amount = (double)$_POST['amount'];
     
         // Validate form data
         if ($amount <= 0) {
-            echo "Please enter a valid amount.";
+            $message = "<p style='color: red; text-align: center;'>Please enter a valid amount.</p>";
             exit();
         }
     
         // Check if the sender has enough balance
         if ($sender_balance < $amount) {
-            echo "Insufficient funds in the sender's account.";
+            $message = "<p style='color: red; text-align: center;'>Insufficient funds in the sender's account.</p>";
             exit();
         }
     
@@ -57,6 +58,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $receiver = $result_receiver->fetch_assoc();
     
             if (!$receiver) {
+                $message = "<p style='color: red; text-align: center;'>Receiver account not found.</p>";
                 throw new Exception("Receiver account not found.");
             }
     
@@ -95,7 +97,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         catch (Exception $e) {
             // Rollback transaction if any error occurs
             $conn->rollback();
-            echo "<p style='color: red; text-align: center;'>Error: " . $e->getMessage() . "</p>";
+            $message= "<p style='color: red; text-align: center;'>Error: " . $e->getMessage() . "</p>";
         }
     }
     else{
@@ -171,7 +173,7 @@ $conn->close();
         }
 
         .transfer-form-container button {
-            background-color: #28a745;
+            background-color: #002855;
             color: white;
             font-size: 16px;
             padding: 10px;
@@ -182,12 +184,11 @@ $conn->close();
         }
 
         .transfer-form-container button:hover {
-            background-color: #218838;
+            background-color: #001a3b;
         }
     </style>
 </head>
 <body>
-<?php echo $message; ?>
 
 <!-- Main container -->
 <div id="main">
@@ -218,6 +219,8 @@ $conn->close();
     </header>
 </div>
 
+<!-- Display the message here -->
+<?php echo $message; ?>
 
     <div class="transfer-form-container">
         <h2>Funds Transfer</h2>

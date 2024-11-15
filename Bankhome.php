@@ -98,7 +98,7 @@ $account = $result_account->fetch_assoc();
                 <p id="lastLogin">Loading...</p>
             </div>
         </div>
-
+        
         <script>
         // Display current date and time for "Last Login"
         const now = new Date();
