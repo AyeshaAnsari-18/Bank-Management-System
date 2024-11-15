@@ -10,46 +10,43 @@
 <body>
 
 <?php
-// Enable error reporting for debugging
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
-
-// Include database connection
+session_start();
 include '../connection.php';
 
-// Initialize session
-session_start();
-$accountId = $_SESSION['AccountId'] ?? null;  // Assuming AccountId is stored in the session after login
-
-// Verify that the database connection is established
-if (!$conn) {
-    die("Database connection failed: " . mysqli_connect_error());
+// Debugging: Check if the session is set
+if (!isset($_SESSION['AccountId'])) {
+    $_SESSION['errorMsg'] = "Session expired or Account ID is unavailable. Please log in again.";
+    header("Location: ../login.html");
+    exit();
 }
 
-// Fetch previous loan applications for the user based on AccountId
+$accountId = $_SESSION['AccountId'];
+
+// Database Connection Check
+if (!$conn) {
+    die("<p class='error-msg'>Database connection failed: " . htmlspecialchars(mysqli_connect_error()) . "</p>");
+}
+
+// Fetch Loan Applications for the User
 $loans = [];
 if ($accountId) {
-    // Debugging line to verify AccountId
-    echo "<!-- AccountId: $accountId -->";
+    $stmt = $conn->prepare("SELECT LoanType, Amount, InterestRate, Status, StartDate, EndDate FROM loan WHERE a_AccountID = ?");
+    if ($stmt) {
+        $stmt->bind_param("s", $accountId);
+        $stmt->execute();
+        $result = $stmt->get_result();
 
-    // Fetch loan details for the given AccountId
-    $stmt = $conn->prepare("SELECT LoanType, Amount, InterestRate, Status, StartDate, EndDate FROM Loan WHERE AccountId = ?");
-    $stmt->bind_param("s", $accountId);
-    $stmt->execute();
-    $result = $stmt->get_result();
-
-    if ($result->num_rows > 0) {
-        while ($row = $result->fetch_assoc()) {
-            $loans[] = $row;
+        if ($result->num_rows > 0) {
+            while ($row = $result->fetch_assoc()) {
+                $loans[] = $row;
+            }
         }
+        $stmt->close();
     } else {
-        echo "<!-- No loans found for AccountId: $accountId -->";  // Debugging output
+        echo "<p class='error-msg'>Failed to prepare the statement. Please try again later.</p>";
     }
-
-    $stmt->close();
 } else {
-    echo "<!-- AccountId session variable is not set. -->";  // Debugging output
+    echo "<p class='error-msg'>Account ID is invalid. Please log in again.</p>";
 }
 ?>
 
@@ -92,9 +89,6 @@ if ($accountId) {
             <?php endif; ?>
 
             <form action="loan_submit.php" method="POST">
-                <label for="account_id">Account ID:</label>
-                <input type="text" id="account_id" name="account_id" required>
-
                 <label for="loan_type">Loan Type:</label>
                 <input type="text" id="loan_type" name="LoanType" required>
 

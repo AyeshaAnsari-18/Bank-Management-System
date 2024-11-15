@@ -1,35 +1,11 @@
 <?php
 session_start();
-include 'connection.php';
 
 // Check if the user is logged in
 if (!isset($_SESSION['customerId'])) {
     header("Location: login.html");
     exit();
 }
-
-// Regenerate session ID to prevent session fixation
-session_regenerate_id();
-
-// Get customerID from the session
-$customerID = $_SESSION['customerId'];
-
-// Fetch user information
-$sql_user = "SELECT Name FROM Customer WHERE CustomerId = ?";
-$stmt_user = $conn->prepare($sql_user);
-$stmt_user->bind_param("s", $customerID);
-$stmt_user->execute();
-$result_user = $stmt_user->get_result();
-$user = $result_user->fetch_assoc();
-
-// Fetch account information
-$sql_account = "SELECT AccountType, Balance, AccountID FROM account WHERE customer_customerID = ?";
-$stmt_account = $conn->prepare($sql_account);
-$stmt_account->bind_param("s", $customerID);
-$stmt_account->execute();
-$result_account = $stmt_account->get_result();
-$account = $result_account->fetch_assoc();
-
 ?>
 
 <!DOCTYPE html>
@@ -41,7 +17,6 @@ $account = $result_account->fetch_assoc();
     <link rel="stylesheet" href="BankHome.css">
     <link href="https://cdn.jsdelivr.net/npm/remixicon@4.3.0/fonts/remixicon.css" rel="stylesheet"/>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
-
 </head>
 <body>
 
@@ -75,38 +50,28 @@ $account = $result_account->fetch_assoc();
 
     <!-- User Info Section -->
     <div class="user-info">
-        <h1>Welcome, <?php echo htmlspecialchars($user['Name']); ?></h1>
-        <p><?php echo htmlspecialchars($user['Name']); ?>'s Account Overview</p>
+        <h1>Welcome, <span id="userName">Loading...</span></h1>
+        <p><span id="userNameOverview">User</span>'s Account Overview</p>
 
         <!-- Account Details -->
-
         <div class="account-details">
             <div class="detail-card">
                 <h2>Account Balance</h2>
-                <p>$<?php echo number_format($account['Balance'], 2); ?></p>
+                <p id="accountBalance">Loading...</p>
             </div>
             <div class="detail-card">
-                <h2>Account Id</h2>
-                <p><?php echo substr($account['AccountID'], -4); ?></p>
+                <h2>Account ID</h2>
+                <p id="accountId">Loading...</p>
             </div>
             <div class="detail-card">
                 <h2>Account Type</h2>
-                <p><?php echo htmlspecialchars($account['AccountType']); ?></p>
+                <p id="accountType">Loading...</p>
             </div>
             <div class="detail-card">
                 <h2>Last Login</h2>
                 <p id="lastLogin">Loading...</p>
             </div>
         </div>
-        
-        <script>
-        // Display current date and time for "Last Login"
-        const now = new Date();
-        const options = { year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric' };
-        document.getElementById('lastLogin').textContent = now.toLocaleString('en-US', options);
-        </script>
-
-        
     </div>
 </div>
 
@@ -117,10 +82,31 @@ $account = $result_account->fetch_assoc();
     </div>
 </footer>
 
+<script>
+    // Fetch user and account details from the API
+    fetch('api/bankhome_api.php', {
+        method: 'GET',
+        credentials: 'include' // Include session cookies
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === 'success') {
+            // Populate data into the page
+            document.getElementById('userName').textContent = data.user.name;
+            document.getElementById('userNameOverview').textContent = data.user.name;
+            document.getElementById('accountBalance').textContent = `$${parseFloat(data.account.balance).toFixed(2)}`;
+            document.getElementById('accountId').textContent = `****${data.account.accountIdLast4}`;
+            document.getElementById('accountType').textContent = data.account.accountType;
+            document.getElementById('lastLogin').textContent = data.lastLogin;
+        } else {
+            alert(data.message || 'Error fetching user data.');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Unable to fetch account details.');
+    });
+</script>
+
 </body>
 </html>
-
-<?php
-// Close the database connection
-$conn->close();
-?>

@@ -15,24 +15,38 @@ session_regenerate_id();
 $customerID = $_SESSION['customerId'];
 
 // Fetch user information
-$sql_user = "SELECT Name FROM Customer WHERE CustomerId = ?";
+$sql_user = "SELECT Name, account_accountID FROM Customer WHERE CustomerId = ?";
 $stmt_user = $conn->prepare($sql_user);
 $stmt_user->bind_param("s", $customerID);
 $stmt_user->execute();
 $result_user = $stmt_user->get_result();
 $user = $result_user->fetch_assoc();
+$stmt_user->close();
 
-$sql_account = "SELECT AccountType, Balance, AccountID FROM account WHERE customer_customerID = ?";
+if (!$user) {
+    echo "User not found.";
+    exit();
+}
+
+// Fetch account information
+$accountID = $user['account_accountID'];
+$sql_account = "SELECT AccountType, Balance, AccountID FROM account WHERE AccountID = ?";
 $stmt_account = $conn->prepare($sql_account);
-$stmt_account->bind_param("s", $customerID);
+$stmt_account->bind_param("s", $accountID);
 $stmt_account->execute();
 $result_account = $stmt_account->get_result();
 $account = $result_account->fetch_assoc();
+$stmt_account->close();
 
-//Fetch recent transactions (limit to last 5)
+if (!$account) {
+    echo "Account information not found.";
+    exit();
+}
+
+// Fetch recent transactions
 $sql_transactions = "SELECT transactionDate, transactionType, transactionAmount FROM transaction WHERE account_AccountID = ? ORDER BY transactionDate DESC LIMIT 6";
 $stmt_transactions = $conn->prepare($sql_transactions);
-$stmt_transactions->bind_param("i", $account['AccountID']);
+$stmt_transactions->bind_param("s", $accountID);
 $stmt_transactions->execute();
 $result_transactions = $stmt_transactions->get_result();
 ?>
@@ -46,32 +60,25 @@ $result_transactions = $stmt_transactions->get_result();
     <link rel="stylesheet" href="../BankHome.css">
     <link href="https://cdn.jsdelivr.net/npm/remixicon@4.3.0/fonts/remixicon.css" rel="stylesheet"/>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
-
 </head>
 <body>
-
 <!-- Main container -->
 <div id="main">
     <!-- Header Section -->
     <header id="header">
-        <!-- Bank Logo -->
         <div id="logo">
             <img src="../logo.png" width="75px" alt="Bank Logo">
         </div>
-
-        <!-- Navigation Links -->
         <nav class="nav-links">
             <a href="../Bankhome.php">Accounts</a>
             <a href="Bank_transaction.php">Transaction</a>
             <a href="Bank_pay.php">Pay</a>
-            <a href="#loans">Loans</a>
-            <a href="#statements">Statements</a>
-            <a href="#support">Support</a>
-            <a href="#profile">Profile</a>
-            <a href="login.html">Logout</a>
+            <a href="Bank_loan.php">Loans</a>
+            <a href="Bank_stats.php">Statements</a>
+            <a href="Bank_support.php">Support</a>
+            <a href="Bank_profile.php">Profile</a>
+            <a href="../login.html">Logout</a>
         </nav>
-
-        <!-- Icons -->
         <div class="icon-group">
             <div class="icon"><i class="ri-search-line"></i></div>
             <div class="icon"><i class="ri-notification-3-line"></i></div>
@@ -81,10 +88,7 @@ $result_transactions = $stmt_transactions->get_result();
     <!-- User Info Section -->
     <div class="user-info">
         <h1>Welcome, <?php echo htmlspecialchars($user['Name']); ?></h1>
-        <p><?php echo htmlspecialchars($user['Name']); ?>'s Account Overview</p>
-
-       
-        <!-- Recent Transactions Section -->
+        <p>Account Overview for <?php echo htmlspecialchars($user['Name']); ?></p>
         <div class="transactions">
             <h2>Recent Transactions</h2>
             <table>
@@ -96,12 +100,12 @@ $result_transactions = $stmt_transactions->get_result();
                     </tr>
                 </thead>
                 <tbody>
-                    <?php while($transaction = $result_transactions->fetch_assoc()): ?>
-                    <tr>
-                        <td><?php echo date("F j, Y", strtotime($transaction['transactionDate'])); ?></td>
-                        <td><?php echo htmlspecialchars($transaction['transactionType']); ?></td>
-                        <td><?php echo ($transaction['transactionType'] == "Debit" ? "-" : "+") . "$" . number_format($transaction['transactionAmount'], 2); ?></td>
-                    </tr>
+                    <?php while ($transaction = $result_transactions->fetch_assoc()): ?>
+                        <tr>
+                            <td><?php echo date("F j, Y", strtotime($transaction['transactionDate'])); ?></td>
+                            <td><?php echo htmlspecialchars($transaction['transactionType']); ?></td>
+                            <td><?php echo ($transaction['transactionType'] == "debit" ? "-" : "+") . "$" . number_format($transaction['transactionAmount'], 2); ?></td>
+                        </tr>
                     <?php endwhile; ?>
                 </tbody>
             </table>
@@ -109,7 +113,6 @@ $result_transactions = $stmt_transactions->get_result();
     </div>
 </div>
 
-<!-- Footer Section -->
 <footer id="footer">
     <div class="footer-content">
         <p>© Copyright 2024 Aegis, Inc. <u>All rights reserved.</u> Various trademarks held by their respective owners.</p>
@@ -120,6 +123,6 @@ $result_transactions = $stmt_transactions->get_result();
 </html>
 
 <?php
-// Close the database connection
+$stmt_transactions->close();
 $conn->close();
 ?>
