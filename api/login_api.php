@@ -15,14 +15,15 @@ if (!$customerId || !$password) {
 }
 
 // Check database for credentials
-$stmt = $conn->prepare("SELECT Password FROM customers WHERE CustomerID = ?");
+$stmt = $conn->prepare("SELECT UserPassword FROM customer WHERE customerId = ?");
 $stmt->bind_param("s", $customerId);
 $stmt->execute();
-$stmt->bind_result($hashedPassword);
+$stmt->bind_result($storedPassword);
 $stmt->fetch();
 $stmt->close();
 
-if (!$hashedPassword || !password_verify($password, $hashedPassword)) {
+// Validate credentials (non-hashed passwords)
+if (!$storedPassword || $password !== $storedPassword) {
     echo json_encode(['status' => 'error', 'message' => 'Invalid Customer ID or password']);
     exit();
 }

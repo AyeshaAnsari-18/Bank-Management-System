@@ -15,10 +15,10 @@
       <!-- Success Message -->
       <div id="successMessage" class="success-message" style="display: none; color: green; text-align: center;">
          <h1>Registration Successful!</h1>
-         <p>Registration successful! Your Customer ID has been sent to your email. Use it to log in.</p>
+         <p>Your registration was successful! Your Customer ID has been sent to your email. Please use it to log in.</p>
       </div>
 
-      <!-- Error Message for Signup or Login -->
+      <!-- Error Message -->
       <div id="errorMessage" class="error-message" style="display: none; color: red; text-align: center;"></div>
 
       <!-- Login Form -->
@@ -89,24 +89,24 @@
    </div>
 
    <script>
-      // Display success or error message based on URL parameters
       window.onload = function() {
          const urlParams = new URLSearchParams(window.location.search);
          const successMessage = document.getElementById("successMessage");
          const errorMessage = document.getElementById("errorMessage");
 
+         // Display success message if signup was successful
          if (urlParams.get("success") === "1") {
             successMessage.style.display = "block";
-            toggleForm('login'); // Show the login form with success message
+            toggleForm('login');
          }
 
+         // Display error messages dynamically
          const error = urlParams.get("error");
          if (error) {
             errorMessage.style.display = "block";
             const errorMessages = {
                incorrect_password: "Incorrect password. Please try again.",
                invalid_customer_id: "Invalid Customer ID. Please try again.",
-               invalid_account_id: "Invalid Account ID. Please check and try again.",  // New error message
                missing_fields: "Please fill in all required fields.",
                email_exists: "Email already exists. Please use a different email address.",
                password_mismatch: "Passwords do not match.",
@@ -115,10 +115,8 @@
                database_error: "A database error occurred. Please try again later."
             };
             errorMessage.textContent = errorMessages[error] || "An unknown error occurred.";
-
-            const signupErrors = ["email_exists", "password_mismatch", "registration_failed", "invalid_account_id", "email_not_sent"];
-            if (signupErrors.includes(error)) {
-               toggleForm('signup'); // Show the signup form with error message
+            if (["email_exists", "password_mismatch", "registration_failed"].includes(error)) {
+               toggleForm('signup');
             }
          }
       };
@@ -139,10 +137,8 @@
          }
       }
 
-      // Handle Login Form Submission
       document.getElementById("loginForm").addEventListener("submit", async function (e) {
-         e.preventDefault(); // Prevent default form submission
-
+         e.preventDefault();
          const customerId = document.getElementById("customer_id").value.trim();
          const password = document.getElementById("password").value.trim();
 
@@ -161,10 +157,9 @@
             const result = await response.json();
 
             if (result.status === 'success') {
-               alert("Login successful!");
-               window.location.href = "../Bankhome.php"; // Redirect to homepage or dashboard
+               window.location.href = "Bankhome.php";
             } else {
-               alert(result.message);
+               alert(result.message || "Login failed. Please try again.");
             }
          } catch (error) {
             console.error("Error:", error);

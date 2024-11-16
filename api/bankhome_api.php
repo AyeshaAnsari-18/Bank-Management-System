@@ -16,7 +16,7 @@ session_regenerate_id();
 $customerID = $_SESSION['customerId'];
 
 // Fetch user information (Name and AccountID associated with the customer)
-$sql_user = "SELECT Name, account_accountID FROM Customer WHERE CustomerId = ?";
+$sql_user = "SELECT Name, account_accountID FROM customer WHERE customerId = ?";
 $stmt_user = $conn->prepare($sql_user);
 $stmt_user->bind_param("s", $customerID);
 $stmt_user->execute();
