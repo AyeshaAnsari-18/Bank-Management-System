@@ -33,6 +33,9 @@ if (!$user) {
 // Get the AccountID from the Customer record
 $accountID = $user['account_accountID'];
 
+// ** Store AccountID in the session **
+$_SESSION['AccountId'] = $accountID;
+
 // Fetch account information using AccountID
 $sql_account = "SELECT AccountType, Balance, AccountID FROM account WHERE AccountID = ?";
 $stmt_account = $conn->prepare($sql_account);

@@ -1,0 +1,177 @@
+/* General Page Styles */
+body {
+    margin: 0;
+    font-family: "Arial", sans-serif;
+    background-color: #f8f9fa;
+}
+
+#main {
+    padding: 20px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: space-around;
+}
+
+/* Header */
+#header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: white;
+    padding: 15px 30px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+#header #logo img {
+    max-width: 120px;
+}
+
+.nav-links {
+    display: flex;
+    gap: 15px;
+}
+
+.nav-links a {
+    color: #003366;
+    text-decoration: none;
+    font-weight: 500;
+    padding: 8px 12px;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.nav-links a:hover {
+    background-color: #003366;
+    color: white;
+    border-radius: 5px;
+}
+
+.icon-group .icon {
+    color: #003366;
+    font-size: 1.5rem;
+    margin-left: 15px;
+    cursor: pointer;
+}
+
+/* Loan Application Form */
+.loan-form-container {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    max-width: 600px;
+    width: 100%;
+    flex-grow: 1;
+}
+
+.loan-form-container h2 {
+    text-align: center;
+    color: #003366;
+    font-size: 1.5rem;
+    margin-bottom: 20px;
+}
+
+.loan-form-container form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.loan-form-container label {
+    font-size: 1rem;
+    color: #333;
+}
+
+.loan-form-container input[type="text"],
+.loan-form-container input[type="number"],
+.loan-form-container input[type="date"] {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 1rem;
+    color: #333;
+    outline: none;
+    transition: border-color 0.3s ease;
+}
+
+.loan-form-container input[type="text"]:focus,
+.loan-form-container input[type="number"]:focus,
+.loan-form-container input[type="date"]:focus {
+    border-color: #003366;
+}
+
+.loan-form-container button {
+    background-color: #003366;
+    color: white;
+    padding: 10px 15px;
+    font-size: 1rem;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.loan-form-container button:hover {
+    background-color: #00509e;
+}
+
+/* Previous Loans Table */
+.previous-loans-container {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    max-width: 600px;
+    width: 100%;
+    flex-grow: 1;
+}
+
+.previous-loans-container h2 {
+    text-align: center;
+    color: #003366;
+    font-size: 1.5rem;
+    margin-bottom: 20px;
+}
+
+.previous-loans-container table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+
+.previous-loans-container th,
+.previous-loans-container td {
+    text-align: left;
+    padding: 10px;
+    border: 1px solid #ddd;
+}
+
+.previous-loans-container th {
+    background-color: #003366;
+    color: white;
+    font-weight: bold;
+}
+
+.previous-loans-container td {
+    color: #333;
+}
+
+.previous-loans-container tr:nth-child(even) {
+    background-color: #f2f2f2;
+}
+
+/* Footer */
+#footer {
+    text-align: center;
+    background-color: #003366;
+    color: white;
+    padding: 10px;
+    position: sticky;
+    bottom: 0;
+    width: 100%;
+    font-size: 0.9rem;
+}
