@@ -2,6 +2,7 @@
 header("Content-Type: application/json"); // Set response type to JSON
 include('connection.php');
 
+// Include PHPMailer namespaces at the top of the file
 require 'PHPMailer/src/Exception.php';
 require 'PHPMailer/src/PHPMailer.php';
 require 'PHPMailer/src/SMTP.php';
@@ -11,19 +12,36 @@ use PHPMailer\PHPMailer\Exception;
 
 // Function to sanitize input data
 function sanitize_input($data) {
-    return htmlspecialchars(stripslashes(trim($data)));
+    return htmlspecialchars(trim($data));
 }
 
-// Retrieve JSON input
-$input = json_decode(file_get_contents("php://input"), true);
-
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
+    // Check content type of the incoming request
+    $contentType = $_SERVER["CONTENT_TYPE"] ?? '';
+    $input = null;
+
+    if (strpos($contentType, 'application/json') !== false) {
+        // Handle JSON input
+        $input = json_decode(file_get_contents("php://input"), true);
+        if ($input === null) {
+            echo json_encode(['status' => 'error', 'message' => 'Invalid JSON input.']);
+            exit();
+        }
+    } elseif (strpos($contentType, 'application/x-www-form-urlencoded') !== false) {
+        // Handle URL-encoded form data
+        $input = $_POST;
+    } else {
+        echo json_encode(['status' => 'error', 'message' => 'Unsupported Content-Type.']);
+        exit();
+    }
+
     // Validate required fields
     if (!isset($input['name'], $input['email'], $input['address'], $input['dob'], $input['phone'], $input['account_id'], $input['signup_password'], $input['confirm_password'])) {
         echo json_encode(['status' => 'error', 'message' => 'All fields are required.']);
         exit();
     }
 
+    // Extract and sanitize input
     $name = sanitize_input($input['name']);
     $email = sanitize_input($input['email']);
     $address = sanitize_input($input['address']);
@@ -88,10 +106,19 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             $mail->Password = 'jubjhrtppgotstfp';
             $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
             $mail->Port = 587;
-
+        
+            $mail->SMTPDebug = 0; // Disable debug output
+            $mail->SMTPOptions = array(
+                'ssl' => array(
+                    'verify_peer' => false,
+                    'verify_peer_name' => false,
+                    'allow_self_signed' => true,
+                )
+            );
+        
             $mail->setFrom('itsa.ansari@gmail.com', 'Aegis Bank');
             $mail->addAddress($email, $name);
-
+        
             $mail->isHTML(true);
             $mail->Subject = 'Welcome to Aegis Bank - Your Customer ID';
             $mail->Body = "
@@ -102,24 +129,20 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 <p>Warm regards,</p>
                 <p><strong>Aegis Bank Support Team</strong></p>
             ";
-
+        
             $mail->send();
-
-            echo json_encode(['status' => 'success', 'message' => 'Registration successful. Customer ID sent to email.', 'customerId' => $customerId]);
+            header('Location: login.html?success=1');
             exit();
+
         } catch (Exception $e) {
             echo json_encode(['status' => 'error', 'message' => 'Account created, but email could not be sent.']);
             exit();
         }
-    } else {
-        echo json_encode(['status' => 'error', 'message' => 'Registration failed. Please try again.']);
-        exit();
-    }
-
+        
     $stmt_insert->close();
 } else {
     echo json_encode(['status' => 'error', 'message' => 'Invalid request method.']);
-    exit();
+}
 }
 
 $conn->close();
