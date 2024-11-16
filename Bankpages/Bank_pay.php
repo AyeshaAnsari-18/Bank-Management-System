@@ -15,7 +15,7 @@ session_regenerate_id();
 $customerID = $_SESSION['customerId'];
 
 // Fetch user information
-$sql_user = "SELECT Name, account_accountID FROM Customer WHERE CustomerId = ?";
+$sql_user = "SELECT Name, account_accountID, Email FROM Customer WHERE CustomerId = ?";
 $stmt_user = $conn->prepare($sql_user);
 $stmt_user->bind_param("s", $customerID);
 $stmt_user->execute();
@@ -43,67 +43,92 @@ if (!$account) {
     exit();
 }
 
-// Initialize message variable
+// Initialize variables
 $message = '';
+$code_sent = false;
 
 // Handle fund transfer submission
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $receiver_account = trim($_POST['receiver_account']);
-    $amount = (float)trim($_POST['amount']);
+    if (isset($_POST['send_code'])) {
+        // Generate a confirmation code
+        $confirmation_code = rand(100000, 999999);
+        $_SESSION['confirmation_code'] = $confirmation_code;
 
-    // Validate inputs
-    if (empty($receiver_account) || $amount <= 0) {
-        $message = "<p style='color: red;'>Please fill in all fields correctly.</p>";
-    } elseif ($account['Balance'] < $amount) {
-        $message = "<p style='color: red;'>Insufficient funds in your account.</p>";
-    } elseif ($receiver_account === $accountID) {
-        $message = "<p style='color: red;'>You cannot transfer funds to your own account.</p>";
-    } else {
-        // Begin transaction
-        $conn->begin_transaction();
-        try {
-            // Check if receiver account exists
-            $sql_receiver = "SELECT AccountID FROM account WHERE AccountID = ?";
-            $stmt_receiver = $conn->prepare($sql_receiver);
-            $stmt_receiver->bind_param("s", $receiver_account);
-            $stmt_receiver->execute();
-            $receiver = $stmt_receiver->get_result()->fetch_assoc();
-            $stmt_receiver->close();
+        // Send the code to the user's email
+        $to = $user['Email'];
+        $subject = "Transaction Confirmation Code";
+        $email_message = "Your confirmation code is: $confirmation_code";
+        $headers = "From: no-reply@yourbank.com";
 
-            if (!$receiver) {
-                throw new Exception("Receiver account not found.");
+        if (mail($to, $subject, $email_message, $headers)) {
+            $message = "<p style='color: green;'>Confirmation code sent to your email.</p>";
+            $code_sent = true;
+        } else {
+            $message = "<p style='color: red;'>Failed to send confirmation code. Please try again later.</p>";
+        }
+    } elseif (isset($_POST['confirm_transaction'])) {
+        $receiver_account = trim($_POST['receiver_account']);
+        $amount = (float)trim($_POST['amount']);
+        $reason = trim($_POST['reason']);
+        $reschedule = isset($_POST['reschedule']) ? 1 : 0;
+        $confirmation_code = trim($_POST['confirmation_code']);
+
+        // Validate inputs
+        if (empty($receiver_account) || $amount <= 0 || empty($reason) || empty($confirmation_code)) {
+            $message = "<p style='color: red;'>Please fill in all fields correctly.</p>";
+        } elseif ($confirmation_code != $_SESSION['confirmation_code']) {
+            $message = "<p style='color: red;'>Invalid confirmation code.</p>";
+        } elseif ($account['Balance'] < $amount) {
+            $message = "<p style='color: red;'>Insufficient funds in your account.</p>";
+        } elseif ($receiver_account === $accountID) {
+            $message = "<p style='color: red;'>You cannot transfer funds to your own account.</p>";
+        } else {
+            // Begin transaction
+            $conn->begin_transaction();
+            try {
+                // Check if receiver account exists
+                $sql_receiver = "SELECT AccountID FROM account WHERE AccountID = ?";
+                $stmt_receiver = $conn->prepare($sql_receiver);
+                $stmt_receiver->bind_param("s", $receiver_account);
+                $stmt_receiver->execute();
+                $receiver = $stmt_receiver->get_result()->fetch_assoc();
+                $stmt_receiver->close();
+
+                if (!$receiver) {
+                    throw new Exception("Receiver account not found.");
+                }
+
+                // Update sender's account balance
+                $sql_update_sender = "UPDATE account SET Balance = Balance - ? WHERE AccountID = ?";
+                $stmt_update_sender = $conn->prepare($sql_update_sender);
+                $stmt_update_sender->bind_param("ds", $amount, $accountID);
+                $stmt_update_sender->execute();
+
+                // Update receiver's account balance
+                $sql_update_receiver = "UPDATE account SET Balance = Balance + ? WHERE AccountID = ?";
+                $stmt_update_receiver = $conn->prepare($sql_update_receiver);
+                $stmt_update_receiver->bind_param("ds", $amount, $receiver_account);
+                $stmt_update_receiver->execute();
+
+                // Log transactions
+                $sql_transaction_sender = "INSERT INTO transaction (transactionAmount, transactiondate, transactiontype, reason, account_AccountID) VALUES (?, NOW(), 'debit', ?, ?)";
+                $stmt_transaction_sender = $conn->prepare($sql_transaction_sender);
+                $stmt_transaction_sender->bind_param("dss", $amount, $reason, $accountID);
+                $stmt_transaction_sender->execute();
+
+                $sql_transaction_receiver = "INSERT INTO transaction (transactionAmount, transactiondate, transactiontype, account_AccountID) VALUES (?, NOW(), 'credit', ?)";
+                $stmt_transaction_receiver = $conn->prepare($sql_transaction_receiver);
+                $stmt_transaction_receiver->bind_param("ds", $amount, $receiver_account);
+                $stmt_transaction_receiver->execute();
+
+                // Commit transaction
+                $conn->commit();
+                $message = "<p style='color: green;'>Funds transferred successfully!</p>";
+            } catch (Exception $e) {
+                // Rollback transaction on error
+                $conn->rollback();
+                $message = "<p style='color: red;'>Transaction failed: " . htmlspecialchars($e->getMessage()) . "</p>";
             }
-
-            // Update sender's account balance
-            $sql_update_sender = "UPDATE account SET Balance = Balance - ? WHERE AccountID = ?";
-            $stmt_update_sender = $conn->prepare($sql_update_sender);
-            $stmt_update_sender->bind_param("ds", $amount, $accountID);
-            $stmt_update_sender->execute();
-
-            // Update receiver's account balance
-            $sql_update_receiver = "UPDATE account SET Balance = Balance + ? WHERE AccountID = ?";
-            $stmt_update_receiver = $conn->prepare($sql_update_receiver);
-            $stmt_update_receiver->bind_param("ds", $amount, $receiver_account);
-            $stmt_update_receiver->execute();
-
-            // Log transactions
-            $sql_transaction_sender = "INSERT INTO transaction (transactionAmount, transactiondate, transactiontype, account_AccountID) VALUES (?, NOW(), 'debit', ?)";
-            $stmt_transaction_sender = $conn->prepare($sql_transaction_sender);
-            $stmt_transaction_sender->bind_param("ds", $amount, $accountID);
-            $stmt_transaction_sender->execute();
-
-            $sql_transaction_receiver = "INSERT INTO transaction (transactionAmount, transactiondate, transactiontype, account_AccountID) VALUES (?, NOW(), 'credit', ?)";
-            $stmt_transaction_receiver = $conn->prepare($sql_transaction_receiver);
-            $stmt_transaction_receiver->bind_param("ds", $amount, $receiver_account);
-            $stmt_transaction_receiver->execute();
-
-            // Commit transaction
-            $conn->commit();
-            $message = "<p style='color: green;'>Funds transferred successfully!</p>";
-        } catch (Exception $e) {
-            // Rollback transaction on error
-            $conn->rollback();
-            $message = "<p style='color: red;'>Transaction failed: " . htmlspecialchars($e->getMessage()) . "</p>";
         }
     }
 }

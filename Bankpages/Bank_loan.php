@@ -13,40 +13,37 @@
 session_start();
 include '../connection.php';
 
-// Debugging: Check if the session is set
-if (!isset($_SESSION['AccountId'])) {
-    $_SESSION['errorMsg'] = "Session expired or Account ID is unavailable. Please log in again.";
-    header("Location: ../login.html");
-    exit();
-}
-
-$accountId = $_SESSION['AccountId'];
-
-// Database Connection Check
-if (!$conn) {
-    die("<p class='error-msg'>Database connection failed: " . htmlspecialchars(mysqli_connect_error()) . "</p>");
-}
-
-// Fetch Loan Applications for the User
+// Initialize variables
+$errorMsg = null;
 $loans = [];
-if ($accountId) {
-    $stmt = $conn->prepare("SELECT LoanType, Amount, InterestRate, Status, StartDate, EndDate FROM loan WHERE a_AccountID = ?");
-    if ($stmt) {
-        $stmt->bind_param("s", $accountId);
-        $stmt->execute();
-        $result = $stmt->get_result();
 
-        if ($result->num_rows > 0) {
-            while ($row = $result->fetch_assoc()) {
-                $loans[] = $row;
-            }
-        }
-        $stmt->close();
-    } else {
-        echo "<p class='error-msg'>Failed to prepare the statement. Please try again later.</p>";
-    }
+// Check if the session variable is set
+if (!isset($_SESSION['AccountId'])) {
+    $errorMsg = "Your session has expired, or Account ID is unavailable. Please log in again to continue.";
 } else {
-    echo "<p class='error-msg'>Account ID is invalid. Please log in again.</p>";
+    $accountId = $_SESSION['AccountId'];
+
+    // Database Connection Check
+    if (!$conn) {
+        $errorMsg = "Database connection failed: " . htmlspecialchars(mysqli_connect_error());
+    } else {
+        // Fetch Loan Applications for the User
+        $stmt = $conn->prepare("SELECT LoanType, Amount, InterestRate, Status, StartDate, EndDate FROM loan WHERE a_AccountID = ?");
+        if ($stmt) {
+            $stmt->bind_param("s", $accountId);
+            $stmt->execute();
+            $result = $stmt->get_result();
+
+            if ($result->num_rows > 0) {
+                while ($row = $result->fetch_assoc()) {
+                    $loans[] = $row;
+                }
+            }
+            $stmt->close();
+        } else {
+            $errorMsg = "Failed to prepare the database query. Please try again later.";
+        }
+    }
 }
 ?>
 
@@ -75,71 +72,79 @@ if ($accountId) {
 
     <!-- Loan Application Section -->
     <section id="loan-application">
-        <!-- Loan Application Form -->
-        <div class="form-container">
-            <h2>Apply for a Personal Loan</h2>
+        <!-- Error Message Display -->
+        <?php if ($errorMsg): ?>
+            <div class="error-msg">
+                <p><?= htmlspecialchars($errorMsg) ?></p>
+                <a href="../login.html" class="btn">Go to Login</a>
+            </div>
+        <?php else: ?>
+            <!-- Loan Application Form -->
+            <div class="form-container">
+                <h2>Apply for a Personal Loan</h2>
 
-            <!-- Display Success or Error Message -->
-            <?php if (isset($_SESSION['confirmationMsg'])): ?>
-                <p class="confirmation-msg"><?= htmlspecialchars($_SESSION['confirmationMsg']) ?></p>
-                <?php unset($_SESSION['confirmationMsg']); ?>
-            <?php elseif (isset($_SESSION['errorMsg'])): ?>
-                <p class="error-msg"><?= htmlspecialchars($_SESSION['errorMsg']) ?></p>
-                <?php unset($_SESSION['errorMsg']); ?>
-            <?php endif; ?>
+                <!-- Display Success or Error Message -->
+                <?php if (isset($_SESSION['confirmationMsg'])): ?>
+                    <p class="confirmation-msg"><?= htmlspecialchars($_SESSION['confirmationMsg']) ?></p>
+                    <?php unset($_SESSION['confirmationMsg']); ?>
+                <?php endif; ?>
 
-            <form action="loan_submit.php" method="POST">
-                <label for="loan_type">Loan Type:</label>
-                <input type="text" id="loan_type" name="LoanType" required>
+                <form action="loan_submit.php" method="POST">
+                    <label for="loan_type">Loan Type:</label>
+                    <input type="text" id="loan_type" name="LoanType" required>
 
-                <label for="amount">Loan Amount (PKR):</label>
-                <input type="number" id="amount" name="Amount" required>
+                    <label for="amount">Loan Amount (PKR):</label>
+                    <input type="number" id="amount" name="Amount" required>
 
-                <label for="interest_rate">Interest Rate (%):</label>
-                <input type="number" step="0.01" id="interest_rate" name="InterestRate" required>
+                    <label for="interest_rate">Interest Rate (%):</label>
+                    <input type="number" step="0.01" id="interest_rate" name="InterestRate" required>
 
-                <label for="start_date">Start Date:</label>
-                <input type="date" id="start_date" name="StartDate" required>
+                    <label for="start_date">Start Date:</label>
+                    <input type="date" id="start_date" name="StartDate" required>
 
-                <label for="end_date">End Date:</label>
-                <input type="date" id="end_date" name="EndDate" required>
+                    <label for="end_date">End Date:</label>
+                    <input type="date" id="end_date" name="EndDate" required>
 
-                <input type="submit" value="Submit Application">
-            </form>
-        </div>
+                    <input type="submit" value="Submit Application">
+                </form>
+            </div>
 
-        <!-- Loan History Table -->
-        <div class="loan-history">
-            <h3>Your Previous Loans</h3>
-            <?php if (!empty($loans)): ?>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Loan Type</th>
-                            <th>Amount (PKR)</th>
-                            <th>Interest Rate (%)</th>
-                            <th>Status</th>
-                            <th>Start Date</th>
-                            <th>End Date</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php foreach ($loans as $loan): ?>
+            <!-- Loan History Table -->
+            <div class="loan-history">
+                <h3>Your Previous Loans</h3>
+                <?php if (!empty($loans)): ?>
+                    <table>
+                        <thead>
                             <tr>
-                                <td><?= htmlspecialchars($loan['LoanType']) ?></td>
-                                <td><?= htmlspecialchars($loan['Amount']) ?></td>
-                                <td><?= htmlspecialchars($loan['InterestRate']) ?></td>
-                                <td><?= htmlspecialchars($loan['Status']) ?></td>
-                                <td><?= htmlspecialchars($loan['StartDate']) ?></td>
-                                <td><?= htmlspecialchars($loan['EndDate']) ?></td>
+                                <th>Loan Type</th>
+                                <th>Amount (PKR)</th>
+                                <th>Interest Rate (%)</th>
+                                <th>Status</th>
+                                <th>Start Date</th>
+                                <th>End Date</th>
                             </tr>
-                        <?php endforeach; ?>
-                    </tbody>
-                </table>
-            <?php else: ?>
-                <p>No previous loans found.</p>
-            <?php endif; ?>
-        </div>
+                        </thead>
+                        <tbody>
+                            <?php foreach ($loans as $loan): ?>
+                                <tr>
+                                    <td><?= htmlspecialchars($loan['LoanType']) ?></td>
+                                    <td><?= htmlspecialchars($loan['Amount']) ?></td>
+                                    <td><?= htmlspecialchars($loan['InterestRate']) ?></td>
+                                    <td>
+                                        <!-- Display "Pending" for Status = 1 -->
+                                        <?= $loan['Status'] == 1 ? "Pending" : htmlspecialchars($loan['Status']) ?>
+                                    </td>
+                                    <td><?= htmlspecialchars($loan['StartDate']) ?></td>
+                                    <td><?= htmlspecialchars($loan['EndDate']) ?></td>
+                                </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                <?php else: ?>
+                    <p>No previous loans found.</p>
+                <?php endif; ?>
+            </div>
+        <?php endif; ?>
     </section>
 </div>
 
