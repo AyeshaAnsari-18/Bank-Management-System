@@ -1,150 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bank Fund Transfer</title>
+    <link rel="stylesheet" href="../Bankhome.css">
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@4.3.0/fonts/remixicon.css" rel="stylesheet"/>
+</head>
+<body>
+
 <?php
 session_start();
 include '../connection.php';
 
-// Check if the user is logged in
-if (!isset($_SESSION['customerId'])) {
-    header("Location: ../login.html");
-    exit();
-}
-
-// Regenerate session ID to prevent session fixation
-session_regenerate_id();
-
-// Get customerID from the session
-$customerID = $_SESSION['customerId'];
-
-// Fetch user information
-$sql_user = "SELECT Name, account_accountID, Email FROM Customer WHERE CustomerId = ?";
-$stmt_user = $conn->prepare($sql_user);
-$stmt_user->bind_param("s", $customerID);
-$stmt_user->execute();
-$result_user = $stmt_user->get_result();
-$user = $result_user->fetch_assoc();
-$stmt_user->close();
-
-if (!$user) {
-    echo "<p style='color: red;'>User not found.</p>";
-    exit();
-}
-
-// Fetch account information
-$accountID = $user['account_accountID'];
-$sql_account = "SELECT AccountType, Balance, AccountID FROM account WHERE AccountID = ?";
-$stmt_account = $conn->prepare($sql_account);
-$stmt_account->bind_param("s", $accountID);
-$stmt_account->execute();
-$result_account = $stmt_account->get_result();
-$account = $result_account->fetch_assoc();
-$stmt_account->close();
-
-if (!$account) {
-    echo "<p style='color: red;'>Account information not found.</p>";
-    exit();
-}
-
 // Initialize variables
-$message = '';
-$code_sent = false;
+$errorMsg = null;
+$successMsg = null;
 
-// Handle fund transfer submission
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    if (isset($_POST['send_code'])) {
-        // Generate a confirmation code
-        $confirmation_code = rand(100000, 999999);
-        $_SESSION['confirmation_code'] = $confirmation_code;
+// Validate session
+if (!isset($_SESSION['AccountId'])) {
+    $errorMsg = "Your session has expired or Account ID is unavailable. Please log in again.";
+} else {
+    $accountId = $_SESSION['AccountId'];
 
-        // Send the code to the user's email
-        $to = $user['Email'];
-        $subject = "Transaction Confirmation Code";
-        $email_message = "Your confirmation code is: $confirmation_code";
-        $headers = "From: no-reply@yourbank.com";
+    // Handle form submission
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        $receiverAccount = $_POST['receiver_account'];
+        $amount = $_POST['amount'];
 
-        if (mail($to, $subject, $email_message, $headers)) {
-            $message = "<p style='color: green;'>Confirmation code sent to your email.</p>";
-            $code_sent = true;
+        // Validate form inputs
+        if (empty($receiverAccount) || empty($amount) || $amount <= 0) {
+            $errorMsg = "Please provide valid Receiver's Account ID and Amount.";
         } else {
-            $message = "<p style='color: red;'>Failed to send confirmation code. Please try again later.</p>";
-        }
-    } elseif (isset($_POST['confirm_transaction'])) {
-        $receiver_account = trim($_POST['receiver_account']);
-        $amount = (float)trim($_POST['amount']);
-        $reason = trim($_POST['reason']);
-        $reschedule = isset($_POST['reschedule']) ? 1 : 0;
-        $confirmation_code = trim($_POST['confirmation_code']);
+            // Check database connection
+            if (!$conn) {
+                $errorMsg = "Database connection failed: " . htmlspecialchars(mysqli_connect_error());
+            } else {
+                // Begin transaction
+                $conn->begin_transaction();
 
-        // Validate inputs
-        if (empty($receiver_account) || $amount <= 0 || empty($reason) || empty($confirmation_code)) {
-            $message = "<p style='color: red;'>Please fill in all fields correctly.</p>";
-        } elseif ($confirmation_code != $_SESSION['confirmation_code']) {
-            $message = "<p style='color: red;'>Invalid confirmation code.</p>";
-        } elseif ($account['Balance'] < $amount) {
-            $message = "<p style='color: red;'>Insufficient funds in your account.</p>";
-        } elseif ($receiver_account === $accountID) {
-            $message = "<p style='color: red;'>You cannot transfer funds to your own account.</p>";
-        } else {
-            // Begin transaction
-            $conn->begin_transaction();
-            try {
-                // Check if receiver account exists
-                $sql_receiver = "SELECT AccountID FROM account WHERE AccountID = ?";
-                $stmt_receiver = $conn->prepare($sql_receiver);
-                $stmt_receiver->bind_param("s", $receiver_account);
-                $stmt_receiver->execute();
-                $receiver = $stmt_receiver->get_result()->fetch_assoc();
-                $stmt_receiver->close();
+                try {
+                    // Check sender's balance
+                    $stmt_balance = $conn->prepare("SELECT Balance FROM account WHERE AccountID = ?");
+                    $stmt_balance->bind_param("s", $accountId);
+                    $stmt_balance->execute();
+                    $result_balance = $stmt_balance->get_result();
+                    $sender = $result_balance->fetch_assoc();
+                    $stmt_balance->close();
 
-                if (!$receiver) {
-                    throw new Exception("Receiver account not found.");
+                    if (!$sender || $sender['Balance'] < $amount) {
+                        throw new Exception("Insufficient balance to complete the transfer.");
+                    }
+
+                    // Deduct amount from sender
+                    $stmt_deduct = $conn->prepare("UPDATE account SET Balance = Balance - ? WHERE AccountID = ?");
+                    $stmt_deduct->bind_param("ds", $amount, $accountId);
+                    if (!$stmt_deduct->execute()) {
+                        throw new Exception("Failed to deduct amount from sender's account.");
+                    }
+                    $stmt_deduct->close();
+
+                    // Add amount to receiver
+                    $stmt_add = $conn->prepare("UPDATE account SET Balance = Balance + ? WHERE AccountID = ?");
+                    $stmt_add->bind_param("ds", $amount, $receiverAccount);
+                    if (!$stmt_add->execute()) {
+                        throw new Exception("Failed to credit amount to receiver's account. Please check the Receiver's Account ID.");
+                    }
+                    $stmt_add->close();
+
+                    // Insert transaction record
+                    $stmt_transaction = $conn->prepare("INSERT INTO transaction (SenderAccountID, ReceiverAccountID, Amount, Date) VALUES (?, ?, ?, NOW())");
+                    $stmt_transaction->bind_param("ssd", $accountId, $receiverAccount, $amount);
+                    if (!$stmt_transaction->execute()) {
+                        throw new Exception("Failed to record the transaction.");
+                    }
+                    $stmt_transaction->close();
+
+                    // Commit transaction
+                    $conn->commit();
+                    $successMsg = "Funds successfully transferred!";
+                } catch (Exception $e) {
+                    $conn->rollback();
+                    $errorMsg = $e->getMessage();
                 }
-
-                // Update sender's account balance
-                $sql_update_sender = "UPDATE account SET Balance = Balance - ? WHERE AccountID = ?";
-                $stmt_update_sender = $conn->prepare($sql_update_sender);
-                $stmt_update_sender->bind_param("ds", $amount, $accountID);
-                $stmt_update_sender->execute();
-
-                // Update receiver's account balance
-                $sql_update_receiver = "UPDATE account SET Balance = Balance + ? WHERE AccountID = ?";
-                $stmt_update_receiver = $conn->prepare($sql_update_receiver);
-                $stmt_update_receiver->bind_param("ds", $amount, $receiver_account);
-                $stmt_update_receiver->execute();
-
-                // Log transactions
-                $sql_transaction_sender = "INSERT INTO transaction (transactionAmount, transactiondate, transactiontype, reason, account_AccountID) VALUES (?, NOW(), 'debit', ?, ?)";
-                $stmt_transaction_sender = $conn->prepare($sql_transaction_sender);
-                $stmt_transaction_sender->bind_param("dss", $amount, $reason, $accountID);
-                $stmt_transaction_sender->execute();
-
-                $sql_transaction_receiver = "INSERT INTO transaction (transactionAmount, transactiondate, transactiontype, account_AccountID) VALUES (?, NOW(), 'credit', ?)";
-                $stmt_transaction_receiver = $conn->prepare($sql_transaction_receiver);
-                $stmt_transaction_receiver->bind_param("ds", $amount, $receiver_account);
-                $stmt_transaction_receiver->execute();
-
-                // Commit transaction
-                $conn->commit();
-                $message = "<p style='color: green;'>Funds transferred successfully!</p>";
-            } catch (Exception $e) {
-                // Rollback transaction on error
-                $conn->rollback();
-                $message = "<p style='color: red;'>Transaction failed: " . htmlspecialchars($e->getMessage()) . "</p>";
             }
         }
     }
 }
 ?>
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pay</title>
-    <link rel="stylesheet" href="../BankHome.css">
-    <link href="https://cdn.jsdelivr.net/npm/remixicon@4.3.0/fonts/remixicon.css" rel="stylesheet"/>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
-</head>
-<body>
 <div id="main">
     <header id="header">
         <div id="logo">
@@ -160,26 +104,26 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <a href="Bank_profile.php">Profile</a>
             <a href="../login.html">Logout</a>
         </nav>
-        <div class="icon-group">
-            <div class="icon"><i class="ri-search-line"></i></div>
-            <div class="icon"><i class="ri-notification-3-line"></i></div>
-        </div>
     </header>
 
     <div class="user-info">
-        <h1>Welcome, <?php echo htmlspecialchars($user['Name']); ?></h1>
-        <p>Account Balance: $<?php echo number_format($account['Balance'], 2); ?></p>
-        <div class="transfer-form">
-            <h2>Transfer Funds</h2>
-            <?php if ($message) echo "<div class='message'>$message</div>"; ?>
-            <form method="POST">
-                <label for="receiver-account">Receiver's Account:</label>
-                <input type="text" id="receiver-account" name="receiver_account" required>
-                <label for="amount">Amount:</label>
-                <input type="number" id="amount" name="amount" min="0.01" step="0.01" required>
-                <button type="submit">Transfer</button>
-            </form>
-        </div>
+        <h1>Transfer Funds</h1>
+        
+        <?php if (!empty($successMsg)): ?>
+            <p class="success"><?php echo $successMsg; ?></p>
+        <?php elseif (!empty($errorMsg)): ?>
+            <p class="error"><?php echo $errorMsg; ?></p>
+        <?php endif; ?>
+
+        <form method="POST" action="Bank_pay.php">
+            <label for="receiver-account">Receiver's Account ID:</label>
+            <input type="text" id="receiver-account" name="receiver_account" required>
+            
+            <label for="amount">Amount:</label>
+            <input type="number" id="amount" name="amount" min="0.01" step="0.01" required>
+            
+            <button type="submit">Transfer</button>
+        </form>
     </div>
 </div>
 <footer id="footer">
@@ -187,5 +131,3 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 </footer>
 </body>
 </html>
-
-<?php $conn->close(); ?>
