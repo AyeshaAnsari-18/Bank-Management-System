@@ -131,7 +131,7 @@ if (!$account) {
                                 <li><strong>Sender's Account:</strong> $sender_account_id</li>
                                 <li><strong>Receiver's Account:</strong> $receiver_account</li>
                                 <li><strong>Amount Transferred:</strong> $$amount</li>
-                                <li><strong>Date:</strong> " . date('Y-m-d H:i:s') . "</li>
+                                <li><strong>Date:</strong> " . date('Y-m-d') . "</li>
                             </ul>
                             <p>Thank you for banking with Aegis Bank!</p>
                             <p><strong>Aegis Bank Support Team</strong></p>
