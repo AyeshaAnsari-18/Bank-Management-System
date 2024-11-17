@@ -367,12 +367,12 @@ html, body {
 
         <!-- Navigation Links -->
         <nav class="nav-links">
-            <a href="Bankhome.php">Accounts</a>
-            <a href="Bankpages/Bank_transaction.php">Transaction</a>
-            <a href="Bankpages/Bank_pay.php">Pay</a>
-            <a href="Bankpages/Bank_loan.php">Loans</a>
-            <a href="Bankpages/Bank_stats.php">Statements</a>
-            <a href="Bankpages/Bank_support.php">Support</a>
+            <a href="../Bankhome.php">Accounts</a>
+            <a href="Bank_transaction.php">Transaction</a>
+            <a href="Bank_pay.php">Pay</a>
+            <a href="Bank_loan.php">Loans</a>
+            <a href="Bank_stats.php">Statements</a>
+            <a href="Bank_support.php">Support</a>
             <a href="Bankpages/">Profile</a>
             <a href="login.html">Logout</a>
         </nav>
