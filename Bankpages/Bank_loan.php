@@ -34,7 +34,7 @@ if (!isset($_SESSION['AccountId'])) {
         $errorMsg = "Database connection failed: " . htmlspecialchars(mysqli_connect_error());
     } else {
         // Fetch Loan Applications for the User
-        $stmt = $conn->prepare("SELECT LoanType, Amount, InterestRate, Status, StartDate, EndDate FROM loan WHERE a_AccountID = ?");
+        $stmt = $conn->prepare("SELECT LoanType, Amount, InterestRate, Status, StartDate, EndDate FROM loan WHERE AccountID = ?");
         if ($stmt) {
             $stmt->bind_param("s", $accountId);
             $stmt->execute();
