@@ -10,11 +10,16 @@ require '../PHPMailer/src/SMTP.php';
 
 include '../connection.php';
 
+// Prevent access to cached pages
+header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
+header("Cache-Control: post-check=0, pre-check=0", false);
+header("Pragma: no-cache");
+
 $message = '';
 
 // Check if the user is logged in
 if (!isset($_SESSION['customerId'])) {
-    header("Location: ../login.html");
+    header("Location: ../login.html?message=login_required");
     exit();
 }
 
@@ -155,8 +160,6 @@ if (!$account) {
 // Close the database connection
 $conn->close();
 ?>
-
-
 
 <!DOCTYPE html>
 <html lang="en">

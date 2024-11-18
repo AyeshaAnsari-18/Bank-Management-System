@@ -17,9 +17,15 @@ include '../connection.php';
 $errorMsg = null;
 $loans = [];
 
+// Prevent access to cached pages
+header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
+header("Cache-Control: post-check=0, pre-check=0", false);
+header("Pragma: no-cache");
 // Check if the session variable is set
 if (!isset($_SESSION['AccountId'])) {
     $errorMsg = "Your session has expired, or Account ID is unavailable. Please log in again to continue.";
+    header("Location: ../login.html?message=login_required");
+    exit();
 } else {
     $accountId = $_SESSION['AccountId'];
 
@@ -45,6 +51,7 @@ if (!isset($_SESSION['AccountId'])) {
         }
     }
 }
+
 ?>
 
 <!-- Main container -->
@@ -150,7 +157,9 @@ if (!isset($_SESSION['AccountId'])) {
 
 <!-- Footer Section -->
 <footer id="footer">
-    <p>© Copyright 2024 Aegis, Inc. All rights reserved.</p>
+    <div class="footer-content">
+        <p>© Copyright 2024 Aegis, Inc. <u>All rights reserved.</u> Various trademarks held by their respective owners.</p>
+    </div>
 </footer>
 
 </body>
