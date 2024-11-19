@@ -37,8 +37,8 @@ if (!isset($_SESSION['customerId'])) {
             <a href="Bankpages/Bank_loan.php">Loans</a>
             <a href="Bankpages/Bank_stats.php">Statements</a>
             <a href="Bankpages/Bank_support.php">Support</a>
-            <a href="Bankpages/">Profile</a>
-            <a href="login.html">Logout</a>
+            <a href="Bankpages/Bank_profile.php">Profile</a>
+            <a href="Bankpages/Bank_logout.php">Logout</a>
         </nav>
 
         <!-- Icons -->
