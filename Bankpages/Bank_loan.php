@@ -34,7 +34,7 @@ if (!isset($_SESSION['AccountId'])) {
         $errorMsg = "Database connection failed: " . htmlspecialchars(mysqli_connect_error());
     } else {
         // Fetch Loan Applications for the User
-        $stmt = $conn->prepare("SELECT LoanType, Amount, InterestRate, Status, StartDate, EndDate FROM loan WHERE AccountID = ?");
+        $stmt = $conn->prepare("SELECT LoanType, Amount, InterestRate, Status, StartDate, EndDate FROM loan WHERE a_AccountID = ?");
         if ($stmt) {
             $stmt->bind_param("s", $accountId);
             $stmt->execute();
@@ -69,7 +69,7 @@ if (!isset($_SESSION['AccountId'])) {
             <a href="Bank_stats.php">Statements</a>
             <a href="Bank_support.php">Support</a>
             <a href="Bank_profile.php">Profile</a>
-            <a href="../login.html">Logout</a>
+            <a href="Bank_logout.php">Logout</a>
         </nav>
         <div class="icon-group">
             <div class="icon"><i class="ri-search-line"></i></div>
