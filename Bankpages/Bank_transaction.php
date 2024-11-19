@@ -87,7 +87,7 @@ header("Pragma: no-cache");
             <a href="Bank_stats.php">Statements</a>
             <a href="Bank_support.php">Support</a>
             <a href="Bank_profile.php">Profile</a>
-            <a href="../login.html">Logout</a>
+            <a href="Bank_logout.php">Logout</a>
         </nav>
         <div class="icon-group">
             <div class="icon"><i class="ri-search-line"></i></div>

@@ -257,7 +257,7 @@ html, body {
     border-radius: 10px;
     box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
     text-align: center;
-    margin: 80px auto 20px; /* Add gap between header and the form */
+    margin: 90px auto 20px; /* Add gap between header and the form */
 }
 
 .transfer-form-container h2 {
@@ -360,7 +360,7 @@ html, body {
 
 </head>
 <body>
-<div id="main">
+<div id="main" style="height: 90%;">
     <!-- Header Section -->
     <header id="header">
         <!-- Bank Logo -->
@@ -376,8 +376,8 @@ html, body {
             <a href="Bank_loan.php">Loans</a>
             <a href="Bank_stats.php">Statements</a>
             <a href="Bank_support.php">Support</a>
-            <a href="Bankpages/">Profile</a>
-            <a href="login.html">Logout</a>
+            <a href="Bank_profile.php">Profile</a>
+            <a href="Bank_logout.php">Logout</a>
         </nav>
 
         <!-- Icons -->
