@@ -34,7 +34,7 @@ $total_balance = mysqli_fetch_assoc(mysqli_query($conn, $total_balance_query))['
 <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>User Dashboard</title>
-    <link rel="stylesheet" href="..css/adminpages.css">
+    <link rel="stylesheet" href="../css/adminpages.css">
     <link href="https://cdn.jsdelivr.net/npm/remixicon@4.3.0/fonts/remixicon.css" rel="stylesheet"/>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
 </head>
@@ -50,11 +50,6 @@ $total_balance = mysqli_fetch_assoc(mysqli_query($conn, $total_balance_query))['
 
         <!-- Navigation Links -->
         <nav class="nav-links">
-<<<<<<< Updated upstream
-            <a href="manage_users.php">Manage Users</a>
-            <a href="Alltransactions.php">View Transactions</a>
-            <a href="../Bankpages/Bank_logout.php">Logout</a>
-=======
             <a href="manage_users.php">Customer Management</a>
             <a href="#">Employee Management</a>
             <a href="#">Transaction Management</a>
@@ -62,7 +57,6 @@ $total_balance = mysqli_fetch_assoc(mysqli_query($conn, $total_balance_query))['
             <a href="#">Branch Management</a>
             <a href="#">Customer Feedback Management</a>
             <a href="adminlogin.html">Logout</a>
->>>>>>> Stashed changes
         </nav>
     </header>
 

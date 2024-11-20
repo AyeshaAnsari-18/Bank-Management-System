@@ -132,6 +132,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         
             $mail->send();
             header('Location: login.html?message=signup_success');
+            
             exit();
 
         } catch (Exception $e) {
