@@ -1,4 +1,4 @@
-<?php
+<?php 
 // Start session and include database connection
 session_start();
 include '../connection.php';
@@ -53,7 +53,7 @@ $total_balance = mysqli_fetch_assoc(mysqli_query($conn, $total_balance_query))['
         <nav class="nav-links">
             <a href="manage_users.php">Manage Users</a>
             <a href="Alltransactions.php">View Transactions</a>
-            <a href="adminlogin.html">Logout</a>
+            <a href="../Bankpages/Bank_logout.php">Logout</a>
         </nav>
 
         <!-- Icons -->
