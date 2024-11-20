@@ -4,7 +4,7 @@
    <meta charset="UTF-8">
    <meta name="viewport" content="width=device-width, initial-scale=1.0">
    <title>Admin Login</title>
-   <link rel="stylesheet" href="../formstyle.css">
+   <link rel="stylesheet" href="../css/formstyle.css">
    <style>
       /* General Reset */
    * {
@@ -157,7 +157,7 @@
    </style>
 </head>
 <body>
-   <div class="container">
+<div class="container">
         <!-- Image Section -->
         <div class="image-section">
             <img src="../pictures/login.png" alt="Illustration" style="width: 80%;"/>
@@ -198,8 +198,8 @@
          document.getElementById('loginForm').addEventListener('submit', function(e) {
              const adminId = document.getElementById('admin_id').value.trim();
              const password = document.getElementById('password').value.trim();
- 
-             if (adminId === '' || password === '') {
+
+if (adminId === '' || password === '') {
                  const errorMessage = document.getElementById('error-message');
                  errorMessage.textContent = 'All fields are required.';
                  errorMessage.style.display = 'block';

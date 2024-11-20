@@ -4,8 +4,7 @@
    <meta charset="UTF-8">
    <meta name="viewport" content="width=device-width, initial-scale=1.0">
    <title>Login and Signup Form</title>
-<<<<<<< Updated upstream
-   <link rel="stylesheet" href="formstyle.css">
+   <link rel="stylesheet" href="css/formstyle.css">
    <style>
       /* General Reset */
    * {
@@ -160,32 +159,25 @@
    }
 
    </style>
-=======
-   <link rel="stylesheet" href="css/formstyle.css">
->>>>>>> Stashed changes
 </head>
 <body>
-   <div class="container" style="display: flex;background-color: rgb(181, 68, 68);">
+<div class="container" style="display: flex;background-color: rgb(181, 68, 68);">
       <!-- Image Section -->
       <div class="image-section">
          <img src="pictures/login.png" alt="Illustration" style="width: 90%;"/>
       </div>
-
-      <div class="form-section">
+<div class="form-section">
          <div class="title">
             <span id="formTitle">Login Form</span>
          </div>
-
-         <!-- Success Message -->
+<!-- Success Message -->
          <div id="successMessage" class="success-message" style="display: none; color: white; text-align: center;">
             <h2>Registration Successful!</h2>
             <p>Your registration was successful! Your Customer ID has been sent to your email. Please use it to log in.</p>
          </div>
-
-         <!-- Error Message -->
+ <!-- Error Message -->
          <div id="errorMessage" class="error-message" style="display: none; color: red; text-align: center;"></div>
-
-         <!-- Login Form -->
+<!-- Login Form -->
          <form id="loginForm" style="display: block;">
             <div class="field">
                <input type="text" id="customer_id" name="customer_id" required placeholder=" ">
@@ -214,8 +206,7 @@
       </div>
    </div>
    <script>
-
-      document.getElementById("loginForm").addEventListener("submit", async function (e) {
+document.getElementById("loginForm").addEventListener("submit", async function (e) {
          e.preventDefault();
          const customerId = document.getElementById("customer_id").value.trim();
          const password = document.getElementById("password").value.trim();
@@ -244,13 +235,10 @@
             alert("An error occurred. Please try again.");
          }
       });
-
-
-      // Extract "message" from the URL parameters
+// Extract "message" from the URL parameters
       const urlParams = new URLSearchParams(window.location.search);
-         const message = urlParams.get('message');
-
-         if (message === 'signup_success') {
+        const message = urlParams.get('message');
+if (message === 'signup_success') {
             const successMessage = document.getElementById("successMessage");
             successMessage.style.display = "block";
          }
@@ -274,4 +262,5 @@
 
    </script>
 </body>
+
 </html>
