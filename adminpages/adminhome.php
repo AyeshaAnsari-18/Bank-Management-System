@@ -18,7 +18,7 @@ $admin = mysqli_fetch_assoc($result);
 // Placeholder queries for bank statistics
 $total_users_query = "SELECT COUNT(*) AS total_users FROM customer";
 $total_transactions_query = "SELECT COUNT(*) AS total_transactions FROM transaction";
-$total_loans_query = "SELECT COUNT(*) AS total_loans FROM loan WHERE Status = 'false'";
+$total_loans_query = "SELECT COUNT(*) AS total_loans FROM loan WHERE Status = '1'";
 $total_balance_query = "SELECT SUM(balance) AS total_balance FROM account";
 
 // Execute queries
@@ -34,36 +34,39 @@ $total_balance = mysqli_fetch_assoc(mysqli_query($conn, $total_balance_query))['
 <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>User Dashboard</title>
-    <link rel="stylesheet" href="../BankHome.css">
+    <link rel="stylesheet" href="..css/adminpages.css">
     <link href="https://cdn.jsdelivr.net/npm/remixicon@4.3.0/fonts/remixicon.css" rel="stylesheet"/>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
-    <title>Admin Dashboard - Aegis Bank</title>
 </head>
 <body>
     <!-- Main container -->
 <div id="main">
     <!-- Header Section -->
-    <header id="header">
+    <header class="header">
         <!-- Bank Logo -->
-        <div id="logo">
-            <img src="../logo.png" width="75px" alt="Bank Logo">
+        <div id="logo" style="padding-top: 20px;">
+            <img src="../logo.png" alt="Bank Logo">
         </div>
 
         <!-- Navigation Links -->
         <nav class="nav-links">
+<<<<<<< Updated upstream
             <a href="manage_users.php">Manage Users</a>
             <a href="Alltransactions.php">View Transactions</a>
             <a href="../Bankpages/Bank_logout.php">Logout</a>
+=======
+            <a href="manage_users.php">Customer Management</a>
+            <a href="#">Employee Management</a>
+            <a href="#">Transaction Management</a>
+            <a href="approve_loans.php">Loan Management</a>
+            <a href="#">Branch Management</a>
+            <a href="#">Customer Feedback Management</a>
+            <a href="adminlogin.html">Logout</a>
+>>>>>>> Stashed changes
         </nav>
-
-        <!-- Icons -->
-        <div class="icon-group">
-            <div class="icon"><i class="ri-search-line"></i></div>
-            <div class="icon"><i class="ri-notification-3-line"></i></div>
-        </div>
     </header>
 
-    <!-- User Info Section -->
+    <!-- Right Content -->
     <div class="user-info">
         <h1>Welcome, <?php echo htmlspecialchars($admin['admin_name']); ?></h1>
         <p><span id="userNameOverview">Admin</span>'s Account Overview</p>
@@ -90,11 +93,5 @@ $total_balance = mysqli_fetch_assoc(mysqli_query($conn, $total_balance_query))['
     </div>
 </div>
 
-    <!-- Footer Section -->
-    <footer id="footer">
-    <div class="footer-content">
-        <p>© Copyright 2024 Aegis, Inc. <u>All rights reserved.</u> Various trademarks held by their respective owners.</p>
-    </div>
-</footer>
 </body>
 </html>
