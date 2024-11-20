@@ -1,0 +1,614 @@
+*{
+    margin: 0%;
+    padding: 0%;
+    box-sizing: border-box;
+    font-family: 'Gill Sans';
+}
+
+html,body{
+    height: 100%;
+    width: 100%;
+}
+
+#main{
+    height: 100%;
+    width: 100%;
+}
+
+#header{
+    height: 15%;
+    width: 100%;
+    position: fixed;
+    display: flex;
+    align-items: center;
+    background-color: white;
+    justify-content: space-around;
+}
+
+#logo{
+    height: 70%;
+}
+
+#logo img{
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.texts{
+    color: #032D60;
+    display: flex;
+    font-weight: 700;
+    font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
+}
+
+.texts a{
+    text-decoration: none;
+    color: #032D60;
+}
+
+.texts:hover{
+    color: rgb(38, 152, 212);
+}
+
+#contact{
+    font-weight: lighter;
+    color: #032D60;
+}
+
+.icon{
+   padding: 10px;
+   border-radius: 50%;
+   color: #032D60;
+}
+
+.icon:hover{
+    background-color:  rgb(203, 228, 237);
+    color: rgb(28, 120, 211);
+}
+
+#login{
+    display: flex;
+    padding: 10px;
+    font-size: large;
+    color: #032D60;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+}
+
+#login:hover{
+    background-color: rgb(209, 225, 235);
+    color: rgb(28, 120, 211);
+    border-radius: 20%;
+}
+
+#try{
+    padding: 10px 20px;
+    color: white;
+    background-color: #2e844a;
+}
+
+#try p{
+    color: white;
+}
+#try:hover{
+    background-color: #312626;
+}
+
+#fakeheader{
+    height: 15%;
+    width: 100%;
+}
+
+#page1{
+    height: 85%;
+    width: 100%;
+    background-image: url("https://wp.salesforce.com/en-ap/wp-content/uploads/sites/14/2024/02/php-marquee-starter-lg-bg.jpg?resize=2048,640");
+}
+
+#strip {
+    background-color: #032D60;
+    height: 8%;
+    width: 100%;
+    text-align: center;
+    align-content: center;
+    color: white;
+}
+
+#strip p{
+    font-weight: bolder;
+}
+
+#strip u{
+    margin-left: 20px;
+    font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+}
+
+.content {
+    display: flex;
+    height: 70%;
+    width: 100%;
+    align-items: center;
+    justify-content: space-around;
+}
+
+#box1{
+    height: 90%;
+    width: 40%;
+}
+
+#box1 h1{
+    font-weight: 600;
+    color: #032D60;
+    font-size: 60px;
+    margin: 30px 10px;
+}
+
+#box1 p{
+    font-weight: lighter;
+    color: #181818;
+    font-size: x-large;
+    margin: 30px 10px;
+}
+
+#buttons {
+    display: flex;
+}
+
+#button1{
+    margin: 10px;
+    width: 25%;
+    padding: 10px 20px;
+    color: white;
+    background-color: rgb(28, 120, 211);
+    text-align: center;
+    border-radius: 5px;
+}
+
+#button1:hover {
+    background-color: #032D60;
+}
+
+#button2{
+    margin: 10px;
+    width: 25%;
+    padding: 10px 20px;
+    color: rgb(28, 120, 211);
+    background-color: white;
+    border: 1px solid rgb(28, 120, 211);
+    text-align: center;
+    border-radius: 5px;
+}
+
+#button2:hover {
+    background-color: rgb(209, 225, 235);
+    color: #032D60;
+    border-color: #032D60 ;
+}
+
+#box2 {
+    height: 75%;
+    width: 40%;
+    border-radius: 15px;
+    border: 2px rgb(214, 211, 211);
+    background-color: white;
+}
+
+#box2 img {
+    height: 100%;
+    width:100%;
+}
+
+#heading{
+    height: 22%;
+    width: 100%;
+    align-content: center;
+    text-align: center;
+    color: #032D60;
+    padding: 20px;
+}
+
+#heading h1{
+    font-weight: 600;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+}
+
+#page2{
+    height: 85%;
+    width: 100%;
+    background-image: url("https://wp.salesforce.com/en-ap/wp-content/uploads/sites/14/2023/03/pb-hp-products-bg.png?resize=2048,625");
+}
+
+#cards {
+    height: 80%;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.card1 {
+    margin-right: 35px;
+    height: 80%;
+    width: 20%;
+    border-radius: 15px;
+    margin-left: 55px;
+    object-fit: cover;
+    box-shadow: 2px 2px 5px rgb(175, 172, 172);
+    border: 1px rgb(214, 211, 211);
+    background-color: white;
+}
+
+.card1 img{
+    height: 45%;
+    width: 100%;
+    border-radius: 15px;
+}
+
+#content1{
+    height: 30%;
+    width: 100%;
+    margin-top: 15px;
+}
+
+#content1 h1 {
+    margin: 20px;
+    font-size: x-large;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    color: #032D60;
+    align-items: center;
+}
+
+#content1 h1:hover {
+    color: rgb(28, 120, 211);
+}
+
+.card1 p{
+    margin: 20px;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    color: #181818;
+    align-items: center;
+}
+
+#under1 {
+    margin-left: 20px;
+    margin-top: 30px;
+}
+
+#under1 u {
+    font-size: large;
+    font-weight: 600;
+    margin-top: 20px;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    color: #032D60;
+}
+
+#under1 u:hover {
+    color: rgb(28, 120, 211);
+    text-decoration: none;
+}
+
+.card2 {
+    height: 80%;
+    width: 20%;
+    border-radius: 15px;
+    margin-right: 35px;
+    object-fit: cover;
+    box-shadow: 2px 2px 5px rgb(175, 172, 172);
+    border: 1px rgb(214, 211, 211);
+    background-color: white;
+}
+
+.card2 img{
+    height: 45%;
+    width: 100%;
+    border-radius: 15px;
+}
+
+#content2 {
+    height: 30%;
+    width: 100%;
+    margin-top: 15px;
+}
+
+#content2 h1 {
+    margin: 20px;
+    font-size: x-large;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    color: #032D60;
+    align-items: center;
+}
+
+#content2 h1:hover {
+    color: rgb(28, 120, 211);
+}
+
+.card2 p{
+    margin: 20px;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    color: #181818;
+    align-items: center;
+}
+
+#under2 {
+    margin-left: 20px;
+    margin-top: 30px;
+}
+
+#under2 u {
+    font-size: large;
+    font-weight: 600;
+    margin-top: 20px;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    color: #032D60;
+}
+
+#under2 u:hover {
+    color: rgb(28, 120, 211);
+    text-decoration: none;
+}
+
+.card3 {
+    height: 80%;
+    width: 20%;
+    border-radius: 15px;
+    margin-right: 35px;
+    object-fit: cover;
+    box-shadow: 2px 2px 5px rgb(175, 172, 172);
+    border: 1px rgb(214, 211, 211);
+    background-color: white;
+}
+
+.card3 img{
+    height: 45%;
+    width: 100%;
+    border-radius: 15px;
+}
+
+#content3{
+    height: 30%;
+    width: 100%;
+    margin-top: 15px;
+}
+
+#content3 h1 {
+    margin: 20px;
+    font-size: x-large;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    color: #032D60;
+    align-items: center;
+}
+
+#content3 h1:hover {
+    color: rgb(28, 120, 211);
+}
+
+.card3 p{
+    margin: 20px;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    color: #181818;
+    align-items: center;
+}
+
+#under3 {
+    margin-left: 20px;
+    margin-top: 30px;
+}
+
+#under3 u {
+    font-size: large;
+    font-weight: 600;
+    margin-top: 20px;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    color: #032D60;
+}
+
+#under3 u:hover {
+    color: rgb(28, 120, 211);
+    text-decoration: none;
+}
+
+.card4 {
+    height: 80%;
+    width: 20%;
+    border-radius: 15px;
+    margin-right: 55px;
+    object-fit: cover;
+    box-shadow: 2px 2px 5px rgb(175, 172, 172);
+    border: 1px rgb(214, 211, 211);
+    background-color: white;
+}
+
+.card4 img{
+    height: 45%;
+    width: 100%;
+    border-radius: 15px;
+}
+
+#content4 {
+    height: 30%;
+    width: 100%;
+    margin-top: 15px;
+}
+
+#content4 h1 {
+    margin: 20px;
+    font-size: x-large;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    color: #032D60;
+    align-items: center;
+}
+
+#content4 h1:hover {
+    color: rgb(28, 120, 211);
+}
+
+.card4 p{
+    margin: 20px;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    color: #181818;
+    align-items: center;
+}
+
+#under4 {
+    margin-left: 20px;
+    margin-top: 30px;
+}
+
+#under4 u {
+    font-size: large;
+    font-weight: 600;
+    margin-top: 20px;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    color: #032D60;
+}
+
+#under4 u:hover {
+    color: rgb(28, 120, 211);
+    text-decoration: none;
+}
+
+#viewBtn {
+    height: 15%;
+    width: 100%;
+    justify-content: center;
+    align-content: center;
+    display: flex;
+}
+
+#viewBtn p{
+    height: 55%;
+    width: 15%;
+    align-items: center;
+    text-align: center;
+    border: 2px solid rgb(28, 120, 211);
+    background-color: white;
+    color: rgb(28, 120, 211);
+    justify-content: center;
+    align-content: center;
+    border-radius: 5px;
+    font-weight: 600;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+}
+
+#viewBtn p:hover {
+    background-color: rgb(209, 225, 235);
+    color: #032D60;
+    border-color: #032D60 ;
+}
+
+#footer {
+    height: 14%;
+    width: 100%;
+    background-color: #032D60;
+    align-content: center;
+}
+
+#first {
+    display: flex;
+}
+
+#icn {
+    margin-top: 25px;
+    display: flex;
+    margin-left: 100px;
+    margin-right: 15px;
+    color: white;
+    width: 15%;
+    text-align: center;
+}
+
+#icn p{
+    margin-left: 5px;
+    margin-right: 5px;
+}
+
+#icn i{
+   font-size: 20px;
+}
+
+.text{
+    margin-left: 60px;
+    text-align: center;
+    margin-top: 25px;
+    display: flex;
+    color: white;
+    font-family:'Gill Sans', 'Gill Sans MT';
+    font-size: 15px;
+}
+
+#text1 {
+    margin-right: 15px;
+    height: 30%;
+}
+
+#text1:hover {
+    color: rgb(28, 120, 211);
+}
+
+#text2 {
+    margin-right: 15px;
+    height: 30%;
+}
+
+#text2:hover {
+    color: rgb(28, 120, 211);
+}
+
+#text3 {
+    margin-right: 15px;
+    height: 30%;
+}
+
+#text3:hover {
+    color: rgb(28, 120, 211);
+}
+
+#text4 {
+    margin-right: 15px;
+    height: 30%;
+}
+
+#text4:hover {
+    color: rgb(28, 120, 211);
+}
+
+#text6 {
+    margin-right: 15px;
+    height: 30%;
+}
+
+#text6:hover {
+    color: rgb(28, 120, 211);
+}
+
+#text7{
+    margin-right: 15px;
+    height: 30%;
+}
+
+#text7:hover {
+    color: rgb(28, 120, 211);
+}
+
+#text8 {
+    margin-right: 15px;
+    height: 30%;
+}
+
+#text8:hover {
+    color: rgb(28, 120, 211);
+}
+
+.text2 {
+    margin-top: 10px;
+    height: 30%;
+    color: white;
+    text-align: center;
+    font-family:'Gill Sans', 'Gill Sans MT';
+    font-size: 15px;
+    margin-right: 3%;
+}
+
+.text2 u:hover {
+    color: rgb(28, 120, 211);
+}

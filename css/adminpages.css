@@ -1,0 +1,153 @@
+/* Reset and General Styling */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Gill Sans', sans-serif;
+}
+
+html, body {
+    height: 100%;
+    width: 100%;
+}
+
+#main {
+    height: 92%;
+    width: 100%;
+    display: flex;
+    background-color: whitesmoke;
+}
+
+/* Header Section */
+.header {
+    height: 100%;
+    width: 20%;
+    background-color: whitesmoke;
+    display: flex;
+    flex-direction: column; /* Align logo and links vertically */
+    align-items: center;
+    padding-top: 20px; /* Add some padding at the top */
+    border-right: 1px solid #ccc; /* Add a dividing line */
+}
+
+/* Bank Logo Styling */
+#logo {
+    width: 96%; /* Logo fits within the header width */
+    text-align: center;
+    margin-bottom: 20px; /* Space between logo and navigation links */
+}
+
+#logo img {
+    width: 100%; /* Fit the logo within the container width */
+    height: auto; /* Maintain aspect ratio */
+    object-fit: contain;
+}
+
+/* Navigation Links Styling */
+.nav-links {
+    display: flex;
+    flex-direction: column; /* Stack links vertically */
+    align-items: flex-start; /* Align links to the left */
+    gap: 25px; /* Equal gap between links */
+    margin-top: 20px;
+    padding-left: 20px; /* Add padding to move links away from the edge */
+    padding-top: 10px;
+}
+
+.nav-links a {
+    color: #032D60;
+    font-weight: bold;
+    text-decoration: none;
+    font-size: 16px;
+    text-align: left; /* Ensure the text aligns properly */
+}
+
+.nav-links a:hover {
+    color: rgb(38, 152, 212);
+}
+
+/* Right Content Section */
+.user-info {
+    flex: 1;
+    background-color: white;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    color: #032D60;
+    padding: 40px;
+}
+
+.user-info h1 {
+    font-weight: bold;
+    font-size: 24px;
+}
+
+.user-info p {
+    font-size: 18px;
+    margin-top: 10px;
+    color: #181818;
+}
+
+/* Account Details Styling */
+.account-details {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-top: 20px;
+}
+
+.detail-card {
+    width: 250px;
+    margin: 15px;
+    padding: 20px;
+    background-color: #f7f7f7;
+    border-radius: 10px;
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+.detail-card h3 {
+    color: #032D60;
+    font-size: 18px;
+    margin-bottom: 10px;
+}
+
+.detail-card p {
+    font-size: 20px;
+    font-weight: bold;
+    color: #181818;
+}
+
+/* Footer Styling */
+#footer {
+    height: 8%;
+    width: 100%;
+    background-color: #032D60;
+    padding: 20px 0;
+    text-align: center;
+    color: white;
+    font-size: 14px;
+}
+
+.footer-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.footer-content p {
+    margin-bottom: 10px;
+    font-size: 15px;
+}
+
+.footer-nav a {
+    color: white;
+    text-decoration: none;
+    margin: 0 10px;
+}
+
+.footer-nav a:hover {
+    color: rgb(28, 120, 211);
+}
