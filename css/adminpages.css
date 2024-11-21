@@ -12,7 +12,7 @@ html, body {
 }
 
 #main {
-    height: 92%;
+    height: 100%;
     width: 100%;
     display: flex;
     background-color: whitesmoke;
@@ -118,36 +118,4 @@ html, body {
     font-size: 20px;
     font-weight: bold;
     color: #181818;
-}
-
-/* Footer Styling */
-#footer {
-    height: 8%;
-    width: 100%;
-    background-color: #032D60;
-    padding: 20px 0;
-    text-align: center;
-    color: white;
-    font-size: 14px;
-}
-
-.footer-content {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-
-.footer-content p {
-    margin-bottom: 10px;
-    font-size: 15px;
-}
-
-.footer-nav a {
-    color: white;
-    text-decoration: none;
-    margin: 0 10px;
-}
-
-.footer-nav a:hover {
-    color: rgb(28, 120, 211);
 }
