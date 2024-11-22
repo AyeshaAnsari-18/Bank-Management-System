@@ -124,7 +124,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create'])) {
             <nav class="nav-links">
                 <a href="../manage_users.php">Customer Management</a>
                 <a href="#">Employee Management</a>
-                <a href="#">Transaction Management</a>
+                <a href="../manage_transaction.php">Transaction Management</a>
                 <a href="../approve_loans.php">Loan Management</a>
                 <a href="#">Branch Management</a>
                 <a href="#">Customer Feedback Management</a>
