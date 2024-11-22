@@ -1,4 +1,4 @@
-<?php
+<?php 
 session_start();
 include '../../connection.php'; // Ensure connection.php initializes $conn properly
 
@@ -19,6 +19,16 @@ if (isset($_GET['employeeID'])) {
         // Update the managerID to NULL in the department table
         $updateManagerQuery = "UPDATE department SET managerID = NULL WHERE managerID = '$employeeID'";
         mysqli_query($conn, $updateManagerQuery);
+    }
+
+    // Check if the employee is a manager in any branch
+    $checkBranchManagerQuery = "SELECT branchID FROM branch WHERE branchManagerID = '$employeeID'";
+    $branchManagerResult = mysqli_query($conn, $checkBranchManagerQuery);
+
+    if ($branchManagerResult && mysqli_num_rows($branchManagerResult) > 0) {
+        // Update the branchManagerID to NULL in the branch table
+        $updateBranchManagerQuery = "UPDATE branch SET branchManagerID = NULL WHERE branchManagerID = '$employeeID'";
+        mysqli_query($conn, $updateBranchManagerQuery);
     }
 
     // Delete the employee

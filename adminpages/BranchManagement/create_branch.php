@@ -8,35 +8,38 @@ if (!isset($_SESSION['admin_id'])) {
     header('Location: ../adminlogin.php');
     exit();
 }
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $departmentID = $_POST['departmentID'];
-    $branchID = $_POST['branchID'];
-    $firstName = $_POST['firstName'];
-    $lastName = $_POST['lastName'];
-    $email = $_POST['email'];
-    $phoneNumber = $_POST['phoneNumber'];
-    $role = $_POST['role'];
-    $salary = $_POST['salary'];
-    $hireDate = $_POST['hireDate'];
 
-     // Check if departmentID exists in the department table
-     $checkDepartmentQuery = "SELECT * FROM department WHERE departmentID = '$departmentID'";
-     $departmentResult = mysqli_query($conn, $checkDepartmentQuery);
- 
-     if (mysqli_num_rows($departmentResult) > 0) {
-         // Department exists, proceed with employee insertion
-         $query = "INSERT INTO employee (departmentID, branchID, firstName, lastName, email, phoneNumber, role, salary, hireDate)
-                   VALUES ('$departmentID', '$branchID','$firstName', '$lastName', '$email', '$phoneNumber', '$role', '$salary', '$hireDate')";
-         if (mysqli_query($conn, $query)) {
-             $message = "Employee added successfully.";
-             header("Location: ../manage_employees.php?message=" . urlencode($message));
-             exit();
-         } else {
-             $message = "Error adding employee: " . mysqli_error($conn);
-         }
-     } else {
-         $message = "Invalid Department ID. Please enter a valid department.";
-     }
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    $branchID = $_POST['branchID'];
+    $branchName = $_POST['branchName'];
+    $location = $_POST['location'];
+    $branchManagerID = $_POST['branchManagerID'];
+    $performanceRating = $_POST['performanceRating'];
+
+    if (is_numeric($performanceRating) && $performanceRating >= 0 && $performanceRating <= 5) {
+        // Check if the branchManagerID exists in the employee table
+        $checkManagerQuery = "SELECT * FROM employee WHERE employeeID = '$branchManagerID'";
+        $managerResult = mysqli_query($conn, $checkManagerQuery);
+
+        if (mysqli_num_rows($managerResult) > 0) {
+            // Manager exists, proceed with branch insertion
+            $query = "INSERT INTO branch (branchName, location, branchManagerID, performanceRating)
+                    VALUES ('$branchName', '$location', '$branchManagerID', '$performanceRating')";
+            
+            if (mysqli_query($conn, $query)) {
+                $message = "Branch added successfully.";
+                header("Location: ../manage_branch.php?message=" . urlencode($message));
+                exit();
+            } else {
+                $message = "Error adding branch: " . mysqli_error($conn);
+            }
+        } else {
+            $message = "Invalid Branch Manager ID. Please enter a valid employee ID.";
+        }
+    }
+    else {
+        $message = "Performance Rating must be a number between 1 and 5.";
+    }
 }
 
 ?>
@@ -46,7 +49,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Create Customer</title>
+    <title>Create Branch</title>
     <link rel="stylesheet" href="../../css/adminpages.css">
     <style>
         body {
@@ -66,7 +69,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         .card h2 {
             margin-bottom: 20px;
             font-size: 24px;
-            color: #333;
+            color: darkblue;
             text-align: center;
         }
         .form {
@@ -128,48 +131,28 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         </header>
         <div class="user-info">
             <div class="card">
-                <h2>Add Employee</h2>
+                <h2>Add Branch</h2>
                 <?php if (!empty($message)): ?>
                     <p class="message"><?= htmlspecialchars($message); ?></p>
                 <?php endif; ?>
                 <form class="form" method="POST" action="">
-                <div>
-                        <label for="departmentID">Department ID</label>
-                        <input type="text" id="departmentID" name="departmentID" required>
+                    <div>
+                        <label for="branchName">Branch Name</label>
+                        <input type="text" id="branchName" name="branchName" required>
                     </div>
                     <div>
-                        <label for="branchID">Branch ID</label>
-                        <input type="text" id="branchID" name="branchID" required>
+                        <label for="location">Location</label>
+                        <input type="text" id="location" name="location" required>
                     </div>
                     <div>
-                        <label for="firstName">First Name</label>
-                        <input type="text" id="firstName" name="firstName" required>
+                        <label for="branchManagerID">Branch Manager ID</label>
+                        <input type="text" id="branchManagerID" name="branchManagerID" required>
                     </div>
                     <div>
-                        <label for="lastName">Last Name</label>
-                        <input type="text" id="lastName" name="lastName" required>
+                        <label for="performanceRating">Performance Rating (1 to 5)</label>
+                        <input type="number" id="performanceRating" name="performanceRating" step="0.1" min="1" max="5" required>
                     </div>
-                    <div>
-                        <label for="email">Email</label>
-                        <input type="email" id="email" name="email" required>
-                    </div>
-                    <div>
-                        <label for="phoneNumber">Phone Number</label>
-                        <input type="number" id="phoneNumber" name="phoneNumber" required>
-                    </div>
-                    <div>
-                        <label for="role">Role</label>
-                        <input type="text" id="role" name="role" required>
-                    </div>
-                    <div>
-                        <label for="salary">Salary</label>
-                        <input type="number" id="salary" name="salary" step="0.01" required>
-                    </div>
-                    <div>
-                        <label for="hireDate">Hire Date</label>
-                        <input type="date" id="hireDate" name="hireDate" required>
-                    </div>
-                    <button type="submit" name="create">Add Employee</button>
+                    <button type="submit" name="create">Add Branch</button>
                 </form>
             </div>
         </div>

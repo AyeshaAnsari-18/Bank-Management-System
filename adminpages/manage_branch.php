@@ -9,11 +9,11 @@ if (!isset($_SESSION['admin_id'])) {
 }
 
 // Fetch all customers
-$result = mysqli_query($conn, "SELECT * FROM employee");
+$result = mysqli_query($conn, "SELECT * FROM branch");
 if (!$result) {
-    die("Error fetching customers: " . mysqli_error($conn));
+    die("Error fetching branches: " . mysqli_error($conn));
 }
-$employees = mysqli_fetch_all($result, MYSQLI_ASSOC);
+$branches = mysqli_fetch_all($result, MYSQLI_ASSOC);
 
 // Get message from query string
 $message = isset($_GET['message']) ? $_GET['message'] : '';
@@ -108,55 +108,45 @@ $message = isset($_GET['message']) ? $_GET['message'] : '';
 
         <!-- Main Content -->
         <div class="user-info">
-            <h1>Employee Information</h1>
+            <h1>Branch Information</h1>
             <?php if (!empty($message)): ?>
                 <p style="color:green;" class="message"><?= htmlspecialchars($message); ?></p>
             <?php endif; ?>
 
             <!-- Action Buttons -->
             <div class="buttons">
-                <button onclick="window.location.href='EmployeeManagement/create_emp.php'">Insert New Employee</button>
+                <button onclick="window.location.href='BranchManagement/create_branch.php'">Insert New Branch</button>
             </div>
 
             <!-- Customer Table -->
             <table>
                 <thead>
                     <tr>
-                        <th>Employee ID</th>
-                        <th>Department ID</th>
                         <th>Branch ID</th>
-                        <th>First Name</th>
-                        <th>Last Name</th>
-                        <th>Email</th>
-                        <th>Phone</th>
-                        <th>Role</th>
-                        <th>Salary</th>
-                        <th>Hire Date</th>
+                        <th>Branch Name</th>
+                        <th>Location</th>
+                        <th>Branch Manager ID</th>
+                        <th>Rating</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <?php foreach ($employees as $employee): ?>
+                    <?php foreach ($branches as $branch): ?>
                         <tr>
-                            <td><?= htmlspecialchars($employee['employeeID'] ?? 'N/A'); ?></td>
-                            <td><?= htmlspecialchars($employee['departmentID'] ?? 'N/A'); ?></td>
-                            <td><?= htmlspecialchars($employee['branchID'] ?? 'N/A'); ?></td>
-                            <td><?= htmlspecialchars($employee['firstName'] ?? 'N/A'); ?></td>
-                            <td><?= htmlspecialchars($employee['lastName'] ?? 'N/A'); ?></td>
-                            <td><?= htmlspecialchars($employee['email'] ?? 'N/A'); ?></td>
-                            <td><?= htmlspecialchars($employee['phoneNumber'] ?? 'N/A'); ?></td>
-                            <td><?= htmlspecialchars($employee['role'] ?? 'N/A'); ?></td>
-                            <td><?= htmlspecialchars($employee['salary'] ?? 'N/A'); ?></td>
-                            <td><?= htmlspecialchars($employee['hireDate'] ?? 'N/A'); ?></td>
+                            <td><?= htmlspecialchars($branch['branchID'] ?? 'N/A'); ?></td>
+                            <td><?= htmlspecialchars($branch['branchName'] ?? 'N/A'); ?></td>
+                            <td><?= htmlspecialchars($branch['location'] ?? 'N/A'); ?></td>
+                            <td><?= htmlspecialchars($branch['branchManagerID'] ?? 'N/A'); ?></td>
+                            <td><?= htmlspecialchars($branch['performanceRating'] ?? 'N/A'); ?></td>
                             <td>
                                 <div class="action-buttons">
                                     <button class="update" 
-                                        onclick="window.location.href='EmployeeManagement/update_emp.php?employeeID=<?= $employee['employeeID']; ?>'">
+                                        onclick="window.location.href='BranchManagement/update_branch.php?branchID=<?= $branch['branchID']; ?>'">
                                         Update
                                     </button>
                                     <button class="delete" 
-                                        onclick="if(confirm('Are you sure you want to delete this employee?')) 
-                                            window.location.href='EmployeeManagement/delete_emp.php?employeeID=<?= $employee['employeeID']; ?>'">
+                                        onclick="if(confirm('Are you sure you want to delete this branch?')) 
+                                            window.location.href='BranchManagement/delete_branch.php?branchID=<?= $branch['branchID']; ?>'">
                                         Delete
                                     </button>
                                 </div>
