@@ -13,7 +13,7 @@ if (!isset($_SESSION['admin_id'])) {
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update'])) {
     // Fetch and sanitize input
     $employeeID = mysqli_real_escape_string($conn, $_POST['employeeID']);
-    $newDepartmentID = mysqli_real_escape_string($conn, $_POST['departmentID']);
+    $newBranchID = mysqli_real_escape_string($conn, $_POST['branchID']);
     $firstName = mysqli_real_escape_string($conn, $_POST['fname']);
     $lastName = mysqli_real_escape_string($conn, $_POST['lname']);
     $email = mysqli_real_escape_string($conn, $_POST['email']);
@@ -22,34 +22,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update'])) {
     $salary = mysqli_real_escape_string($conn, $_POST['Salary']);
     $hireDate = mysqli_real_escape_string($conn, $_POST['hdate']);
 
-    // Get the current department of the employee
-    $queryCurrentDept = "SELECT departmentID FROM employee WHERE employeeID = '$employeeID'";
-    $resultCurrentDept = mysqli_query($conn, $queryCurrentDept);
+    // Get the current branch of the employee
+    $queryCurrentBranch = "SELECT branchID FROM employee WHERE employeeID = '$employeeID'";
+    $resultCurrentBranch = mysqli_query($conn, $queryCurrentBranch);
 
-    if ($resultCurrentDept && mysqli_num_rows($resultCurrentDept) > 0) {
-        $currentDepartment = mysqli_fetch_assoc($resultCurrentDept)['departmentID'];
+    if ($resultCurrentBranch && mysqli_num_rows($resultCurrentBranch) > 0) {
+        $currentBranchID = mysqli_fetch_assoc($resultCurrentBranch)['branchID'];
 
-        // If department ID is being changed, check and handle the manager case
-        if ($currentDepartment != $newDepartmentID) {
-            // Check if the employee is a manager in the current department
-            $checkManagerQuery = "SELECT * FROM department WHERE managerID = '$employeeID'";
+        // If branch ID is being changed, check and handle the branch manager case
+        if ($currentBranchID != $newBranchID) {
+            // Check if the employee is a manager in the current branch
+            $checkManagerQuery = "SELECT * FROM branch WHERE branchManagerID = '$employeeID'";
             $managerResult = mysqli_query($conn, $checkManagerQuery);
 
             if ($managerResult && mysqli_num_rows($managerResult) > 0) {
-                // Update managerID to NULL in the department table
-                $updateManagerQuery = "UPDATE department SET managerID = NULL WHERE managerID = '$employeeID'";
+                // Update branchManagerID to NULL in the old branch
+                $updateManagerQuery = "UPDATE branch SET branchManagerID = NULL WHERE branchID = '$currentBranchID'";
                 mysqli_query($conn, $updateManagerQuery);
             }
         }
 
-        // Validate if the new departmentID exists in the department table
-        $checkDepartmentQuery = "SELECT * FROM department WHERE departmentID = '$newDepartmentID'";
-        $departmentResult = mysqli_query($conn, $checkDepartmentQuery);
+        // Validate if the new branchID exists in the branch table
+        $checkBranchQuery = "SELECT * FROM branch WHERE branchID = '$newBranchID'";
+        $branchResult = mysqli_query($conn, $checkBranchQuery);
 
-        if (mysqli_num_rows($departmentResult) > 0) {
+        if (mysqli_num_rows($branchResult) > 0) {
             // Proceed with employee update
             $queryUpdate = "UPDATE employee 
-                            SET departmentID = '$newDepartmentID', firstName = '$firstName', lastName = '$lastName', 
+                            SET branchID = '$newBranchID', firstName = '$firstName', lastName = '$lastName', 
                                 email = '$email', phoneNumber = '$phoneNumber', role = '$role', 
                                 salary = '$salary', hireDate = '$hireDate'
                             WHERE employeeID = '$employeeID'";
@@ -65,7 +65,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update'])) {
                 $message = "Error updating employee: " . mysqli_error($conn);
             }
         } else {
-            $message = "Invalid Department ID. Please enter a valid department.";
+            $message = "Invalid Branch ID. Please enter a valid branch.";
         }
     } else {
         $message = "Employee not found.";
@@ -168,7 +168,7 @@ if ($employeeID) {
                 <a href="../manage_employees.php">Employee Management</a>
                 <a href="../manage_transaction.php">Transaction Management</a>
                 <a href="../approve_loans.php">Loan Management</a>
-                <a href="#">Branch Management</a>
+                <a href="../manage_branch.php">Branch Management</a>
                 <a href="#">Customer Feedback Management</a>
                 <a href="adminlogin.html">Logout</a>
             </nav>
