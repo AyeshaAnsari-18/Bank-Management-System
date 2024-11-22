@@ -51,7 +51,7 @@ $total_balance = mysqli_fetch_assoc(mysqli_query($conn, $total_balance_query))['
         <!-- Navigation Links -->
         <nav class="nav-links">
             <a href="manage_users.php">Customer Management</a>
-            <a href="#">Employee Management</a>
+            <a href="manage_employees.php">Employee Management</a>
             <a href="manage_transaction.php">Transaction Management</a>
             <a href="approve_loans.php">Loan Management</a>
             <a href="#">Branch Management</a>

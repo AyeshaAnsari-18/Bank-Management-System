@@ -8,42 +8,36 @@ if (!isset($_SESSION['admin_id'])) {
     header('Location: ../adminlogin.php');
     exit();
 }
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    $departmentID = $_POST['departmentID'];
+    $firstName = $_POST['firstName'];
+    $lastName = $_POST['lastName'];
+    $email = $_POST['email'];
+    $phoneNumber = $_POST['phoneNumber'];
+    $role = $_POST['role'];
+    $salary = $_POST['salary'];
+    $hireDate = $_POST['hireDate'];
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create'])) {
-    // Sanitize input
-    $account_type = mysqli_real_escape_string($conn, $_POST['account_type']);
-    $balance = $_POST['balance'];
-    $name = mysqli_real_escape_string($conn, $_POST['name']);
-    $email = mysqli_real_escape_string($conn, $_POST['email']);
-    $address = mysqli_real_escape_string($conn, $_POST['address']);
-    $dob = mysqli_real_escape_string($conn, $_POST['dob']);
-    $phone = $_POST['phone'];
-    $password = mysqli_real_escape_string($conn, $_POST['password']);
-
-    // Insert into `account` table
-    $account_sql = "INSERT INTO account (AccountType, Balance) VALUES ('$account_type', '$balance')";
-    if (mysqli_query($conn, $account_sql)) {
-        $accountID = mysqli_insert_id($conn); // Get last inserted account ID
-
-        // Check if account ID was retrieved
-        if ($accountID) {
-            // Insert into `customer` table
-            $customer_sql = "INSERT INTO customer (account_accountID, Name, Email, Address, DateOfBirth, Phone, UserPassword) 
-                             VALUES ('$accountID', '$name', '$email', '$address', '$dob', '$phone', '$password')";
-            if (mysqli_query($conn, $customer_sql)) {
-                $message = "User created successfully.";
-                header("Location: ../manage_users.php?message=" . urlencode($message));
-                exit();
-            } else {
-                $message = "Error inserting customer: " . mysqli_error($conn);
-            }
-        } else {
-            $message = "Failed to retrieve account ID.";
-        }
-    } else {
-        $message = "Error inserting account: " . mysqli_error($conn);
-    }
+     // Check if departmentID exists in the department table
+     $checkDepartmentQuery = "SELECT * FROM department WHERE departmentID = '$departmentID'";
+     $departmentResult = mysqli_query($conn, $checkDepartmentQuery);
+ 
+     if (mysqli_num_rows($departmentResult) > 0) {
+         // Department exists, proceed with employee insertion
+         $query = "INSERT INTO employee (departmentID, firstName, lastName, email, phoneNumber, role, salary, hireDate)
+                   VALUES ('$departmentID', '$firstName', '$lastName', '$email', '$phoneNumber', '$role', '$salary', '$hireDate')";
+         if (mysqli_query($conn, $query)) {
+             $message = "Employee added successfully.";
+             header("Location: ../manage_employees.php?message=" . urlencode($message));
+             exit();
+         } else {
+             $message = "Error adding employee: " . mysqli_error($conn);
+         }
+     } else {
+         $message = "Invalid Department ID. Please enter a valid department.";
+     }
 }
+
 ?>
 
 <!DOCTYPE html>
@@ -133,44 +127,44 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create'])) {
         </header>
         <div class="user-info">
             <div class="card">
-                <h2>Create Customer</h2>
+                <h2>Add Employee</h2>
                 <?php if (!empty($message)): ?>
                     <p class="message"><?= htmlspecialchars($message); ?></p>
                 <?php endif; ?>
                 <form class="form" method="POST" action="">
-                    <div>
-                        <label for="account_type">Account Type</label>
-                        <input type="text" id="account_type" name="account_type" required>
+                <div>
+                        <label for="departmentID">Department ID</label>
+                        <input type="text" id="departmentID" name="departmentID" required>
                     </div>
                     <div>
-                        <label for="balance">Balance</label>
-                        <input type="number" id="balance" name="balance" required>
+                        <label for="firstName">First Name</label>
+                        <input type="text" id="firstName" name="firstName" required>
                     </div>
                     <div>
-                        <label for="name">Name</label>
-                        <input type="text" id="name" name="name" required>
+                        <label for="lastName">Last Name</label>
+                        <input type="text" id="lastName" name="lastName" required>
                     </div>
                     <div>
                         <label for="email">Email</label>
                         <input type="email" id="email" name="email" required>
                     </div>
                     <div>
-                        <label for="address">Address</label>
-                        <input type="text" id="address" name="address" required>
+                        <label for="phoneNumber">Phone Number</label>
+                        <input type="text" id="phoneNumber" name="phoneNumber" required>
                     </div>
                     <div>
-                        <label for="dob">Date of Birth</label>
-                        <input type="date" id="dob" name="dob" required>
+                        <label for="role">Role</label>
+                        <input type="text" id="role" name="role" required>
                     </div>
                     <div>
-                        <label for="phone">Phone</label>
-                        <input type="tel" id="phone" name="phone" required>
+                        <label for="salary">Salary</label>
+                        <input type="number" id="salary" name="salary" step="0.01" required>
                     </div>
                     <div>
-                        <label for="password">Password</label>
-                        <input type="password" id="password" name="password" required>
+                        <label for="hireDate">Hire Date</label>
+                        <input type="date" id="hireDate" name="hireDate" required>
                     </div>
-                    <button type="submit" name="create">Create Customer</button>
+                    <button type="submit" name="create">Add Employee</button>
                 </form>
             </div>
         </div>

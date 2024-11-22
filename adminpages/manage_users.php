@@ -74,12 +74,12 @@ $message = isset($_GET['message']) ? $_GET['message'] : '';
             cursor: pointer;
         }
         .action-buttons button.update {
-            background-color: #007BFF;
+            background-color: darkblue;
             color: white;
             border: none;
         }
         .action-buttons button.delete {
-            background-color: #DC3545;
+            background-color: darkblue;
             color: white;
             border: none;
         }
@@ -97,7 +97,7 @@ $message = isset($_GET['message']) ? $_GET['message'] : '';
             </div>
             <nav class="nav-links">
                 <a href="manage_users.php">Customer Management</a>
-                <a href="#">Employee Management</a>
+                <a href="manage_employees.php">Employee Management</a>
                 <a href="manage_transaction.php">Transaction Management</a>
                 <a href="approve_loans.php">Loan Management</a>
                 <a href="#">Branch Management</a>

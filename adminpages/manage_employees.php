@@ -1,6 +1,6 @@
 <?php
 session_start();
-include '../connection.php'; // Database connection
+include '../connection.php';
 
 // Check if admin is logged in
 if (!isset($_SESSION['admin_id'])) {
@@ -8,12 +8,12 @@ if (!isset($_SESSION['admin_id'])) {
     exit();
 }
 
-// Fetch all transactions
-$result = mysqli_query($conn, "SELECT * FROM transaction");
+// Fetch all customers
+$result = mysqli_query($conn, "SELECT * FROM employee");
 if (!$result) {
-    die("Error fetching transactions: " . mysqli_error($conn));
+    die("Error fetching customers: " . mysqli_error($conn));
 }
-$transactions = mysqli_fetch_all($result, MYSQLI_ASSOC);
+$employees = mysqli_fetch_all($result, MYSQLI_ASSOC);
 
 // Get message from query string
 $message = isset($_GET['message']) ? $_GET['message'] : '';
@@ -24,7 +24,7 @@ $message = isset($_GET['message']) ? $_GET['message'] : '';
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>All Transactions</title>
+    <title>Manage Employees</title>
     <link rel="stylesheet" href="../css/adminpages.css">
     <style>
         .user-info h1{
@@ -89,7 +89,6 @@ $message = isset($_GET['message']) ? $_GET['message'] : '';
     </style>
 </head>
 <body>
-
     <div id="main">
         <!-- Header Section -->
         <header class="header">
@@ -109,51 +108,58 @@ $message = isset($_GET['message']) ? $_GET['message'] : '';
 
         <!-- Main Content -->
         <div class="user-info">
-            <h1>All Transactions</h1>
+            <h1>Employee Information</h1>
             <?php if (!empty($message)): ?>
                 <p style="color:green;" class="message"><?= htmlspecialchars($message); ?></p>
             <?php endif; ?>
 
             <!-- Action Buttons -->
             <div class="buttons">
-                <button onclick="window.location.href='TransactionManagement/create_tr.php'">Insert New Transaction</button>
+                <button onclick="window.location.href='EmployeeManagement/create_emp.php'">Insert New Employee</button>
             </div>
 
-            <!-- Transaction Table -->
+            <!-- Customer Table -->
             <table>
                 <thead>
                     <tr>
-                    <th>Transaction ID</th>
-                    <th>Account ID</th>
-                    <th>Date</th>
-                    <th>Type</th>
-                    <th>Amount</th>
-                    <th>Action</th>
+                        <th>Employee ID</th>
+                        <th>Department ID</th>
+                        <th>First Name</th>
+                        <th>Last Name</th>
+                        <th>Email</th>
+                        <th>Phone</th>
+                        <th>Role</th>
+                        <th>Salary</th>
+                        <th>Hire Date</th>
+                        <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody>
-                    
-                    <?php foreach ($transactions as $transaction): ?>
-                    <tr>
-                        <td><?= htmlspecialchars($transaction['transactionID'] ?? 'N/A'); ?></td>
-                        <td><?= htmlspecialchars($transaction['account_AccountID'] ?? 'N/A'); ?></td>
-                        <td><?= htmlspecialchars($transaction['transactionDate'] ?? 'N/A'); ?></td>
-                        <td><?= htmlspecialchars($transaction['transactionType'] ?? 'N/A'); ?></td>
-                        <td><?= htmlspecialchars($transaction['transactionAmount'] ?? 'N/A'); ?></td>
-                        <td>
-                            <div class="action-buttons">
-                            <button class="update" 
-                                onclick="window.location.href='TransactionManagement/update_tr.php?transactionID=<?= $transaction['transactionID']; ?>'">
-                                Update
-                            </button>
-                            <button class="delete" 
-                                onclick="if(confirm('Are you sure you want to delete this transaction?')) 
-                                window.location.href='TransactionManagement/delete_tr.php?transactionID=<?= $transaction['transactionID']; ?>'">
-                                Delete
-                            </button>
-                            </div>
-                        </td>
-                    </tr>
+                    <?php foreach ($employees as $employee): ?>
+                        <tr>
+                            <td><?= htmlspecialchars($employee['employeeID'] ?? 'N/A'); ?></td>
+                            <td><?= htmlspecialchars($employee['departmentID'] ?? 'N/A'); ?></td>
+                            <td><?= htmlspecialchars($employee['firstName'] ?? 'N/A'); ?></td>
+                            <td><?= htmlspecialchars($employee['lastName'] ?? 'N/A'); ?></td>
+                            <td><?= htmlspecialchars($employee['email'] ?? 'N/A'); ?></td>
+                            <td><?= htmlspecialchars($employee['phoneNumber'] ?? 'N/A'); ?></td>
+                            <td><?= htmlspecialchars($employee['role'] ?? 'N/A'); ?></td>
+                            <td><?= htmlspecialchars($employee['salary'] ?? 'N/A'); ?></td>
+                            <td><?= htmlspecialchars($employee['hireDate'] ?? 'N/A'); ?></td>
+                            <td>
+                                <div class="action-buttons">
+                                    <button class="update" 
+                                        onclick="window.location.href='EmployeeManagement/update_emp.php?employeeID=<?= $employee['employeeID']; ?>'">
+                                        Update
+                                    </button>
+                                    <button class="delete" 
+                                        onclick="if(confirm('Are you sure you want to delete this employee?')) 
+                                            window.location.href='EmployeeManagement/delete_emp.php?employeeID=<?= $employee['employeeID']; ?>'">
+                                        Delete
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
                     <?php endforeach; ?>
                 </tbody>
             </table>
