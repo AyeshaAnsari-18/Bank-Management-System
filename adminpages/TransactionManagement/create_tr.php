@@ -17,39 +17,49 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $type = $_POST['transactionType'];
         $amount = $_POST['transactionAmount'];
 
-        // Start a transaction
-        mysqli_begin_transaction($conn);
+        // Check if account_AccountID exists in the account table
+        $checkAccountQuery = "SELECT * FROM account WHERE AccountID = '$accountID'";
+        $accountResult = mysqli_query($conn, $checkAccountQuery);
 
-        try {
-            // Insert into transaction table
-            $query = "INSERT INTO transaction (account_AccountID, transactionDate, transactionType, transactionAmount) 
-                      VALUES ('$accountID', '$date', '$type', '$amount')";
-            if (!mysqli_query($conn, $query)) {
-                throw new Exception("Error inserting transaction: " . mysqli_error($conn));
+        if (mysqli_num_rows($accountResult) > 0) {
+            // Start a transaction
+            mysqli_begin_transaction($conn);
+
+            try {
+                // Insert into transaction table
+                $query = "INSERT INTO transaction (account_AccountID, transactionDate, transactionType, transactionAmount) 
+                          VALUES ('$accountID', '$date', '$type', '$amount')";
+                if (!mysqli_query($conn, $query)) {
+                    throw new Exception("Error inserting transaction: " . mysqli_error($conn));
+                }
+
+                // Update the Balance in account table
+                $balanceQuery = $type === 'Credit' 
+                    ? "UPDATE account SET Balance = Balance + $amount WHERE AccountID = '$accountID'" 
+                    : "UPDATE account SET Balance = Balance - $amount WHERE AccountID = '$accountID'";
+
+                if (!mysqli_query($conn, $balanceQuery)) {
+                    throw new Exception("Error updating balance: " . mysqli_error($conn));
+                }
+
+                // Commit the transaction
+                mysqli_commit($conn);
+                $message = "Transaction created and account balance updated successfully.";
+                header("Location: ../manage_transaction.php?message=" . urlencode($message));
+                exit();
+            } catch (Exception $e) {
+                // Rollback transaction in case of error
+                mysqli_rollback($conn);
+                $message = $e->getMessage();
             }
-
-            // Update the Balance in account table
-            $balanceQuery = $type === 'Credit' 
-                ? "UPDATE account SET Balance = Balance + $amount WHERE AccountID = '$accountID'" 
-                : "UPDATE account SET Balance = Balance - $amount WHERE AccountID = '$accountID'";
-
-            if (!mysqli_query($conn, $balanceQuery)) {
-                throw new Exception("Error updating balance: " . mysqli_error($conn));
-            }
-
-            // Commit the transaction
-            mysqli_commit($conn);
-            $message = "Transaction created and account balance updated successfully.";
-            header("Location: ../manage_transaction.php?message=" . urlencode($message));
-            exit();
-        } catch (Exception $e) {
-            // Rollback transaction in case of error
-            mysqli_rollback($conn);
-            $message = $e->getMessage();
+        } else {
+            // If account doesn't exist, set the message
+            $message = "Invalid Account ID. The account does not exist.";
         }
     }
 }
 ?>
+
 
 
 <!DOCTYPE html>

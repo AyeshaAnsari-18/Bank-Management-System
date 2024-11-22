@@ -14,6 +14,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update'])) {
     // Fetch and sanitize input
     $employeeID = mysqli_real_escape_string($conn, $_POST['employeeID']);
     $newBranchID = mysqli_real_escape_string($conn, $_POST['branchID']);
+    $newDepartmentID = mysqli_real_escape_string($conn, $_POST['departmentID']);
     $firstName = mysqli_real_escape_string($conn, $_POST['fname']);
     $lastName = mysqli_real_escape_string($conn, $_POST['lname']);
     $email = mysqli_real_escape_string($conn, $_POST['email']);
@@ -22,12 +23,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update'])) {
     $salary = mysqli_real_escape_string($conn, $_POST['Salary']);
     $hireDate = mysqli_real_escape_string($conn, $_POST['hdate']);
 
-    // Get the current branch of the employee
-    $queryCurrentBranch = "SELECT branchID FROM employee WHERE employeeID = '$employeeID'";
-    $resultCurrentBranch = mysqli_query($conn, $queryCurrentBranch);
+    // Get the current branch and department of the employee
+    $queryCurrentDetails = "SELECT branchID, departmentID FROM employee WHERE employeeID = '$employeeID'";
+    $resultCurrentDetails = mysqli_query($conn, $queryCurrentDetails);
 
-    if ($resultCurrentBranch && mysqli_num_rows($resultCurrentBranch) > 0) {
-        $currentBranchID = mysqli_fetch_assoc($resultCurrentBranch)['branchID'];
+    if ($resultCurrentDetails && mysqli_num_rows($resultCurrentDetails) > 0) {
+        $currentDetails = mysqli_fetch_assoc($resultCurrentDetails);
+        $currentBranchID = $currentDetails['branchID'];
+        $currentDepartmentID = $currentDetails['departmentID'];
 
         // If branch ID is being changed, check and handle the branch manager case
         if ($currentBranchID != $newBranchID) {
@@ -46,11 +49,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update'])) {
         $checkBranchQuery = "SELECT * FROM branch WHERE branchID = '$newBranchID'";
         $branchResult = mysqli_query($conn, $checkBranchQuery);
 
-        if (mysqli_num_rows($branchResult) > 0) {
+        // Validate if the new departmentID exists in the department table
+        $checkDepartmentQuery = "SELECT * FROM department WHERE departmentID = '$newDepartmentID'";
+        $departmentResult = mysqli_query($conn, $checkDepartmentQuery);
+
+        if (mysqli_num_rows($branchResult) > 0 && mysqli_num_rows($departmentResult) > 0) {
             // Proceed with employee update
             $queryUpdate = "UPDATE employee 
-                            SET branchID = '$newBranchID', firstName = '$firstName', lastName = '$lastName', 
-                                email = '$email', phoneNumber = '$phoneNumber', role = '$role', 
+                            SET branchID = '$newBranchID', departmentID = '$newDepartmentID', firstName = '$firstName', 
+                                lastName = '$lastName', email = '$email', phoneNumber = '$phoneNumber', role = '$role', 
                                 salary = '$salary', hireDate = '$hireDate'
                             WHERE employeeID = '$employeeID'";
             if (mysqli_query($conn, $queryUpdate)) {
@@ -65,7 +72,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update'])) {
                 $message = "Error updating employee: " . mysqli_error($conn);
             }
         } else {
-            $message = "Invalid Branch ID. Please enter a valid branch.";
+            $message = "Invalid Branch ID or Department ID. Please enter valid IDs.";
         }
     } else {
         $message = "Employee not found.";
@@ -85,9 +92,6 @@ if ($employeeID) {
     }
 }
 ?>
-
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -186,7 +190,10 @@ if ($employeeID) {
                         <label for="departmentID">Department ID</label>
                         <input type="text" id= "departmentID" name="departmentID" value="<?= htmlspecialchars($employee['departmentID']); ?>">
                     </div>
-                    
+                    <div>
+                        <label for="branchID">Branch ID</label>
+                        <input type="text" id= "branchID" name="branchID" value="<?= htmlspecialchars($employee['branchID']); ?>">
+                    </div>
                     <div>
                         <label for="fname">First Name</label>
                         <input type="text" id="fname" name="fname" value="<?= htmlspecialchars($employee['firstName']); ?>" required>
