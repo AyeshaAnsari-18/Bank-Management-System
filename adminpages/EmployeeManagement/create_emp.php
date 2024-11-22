@@ -8,6 +8,7 @@ if (!isset($_SESSION['admin_id'])) {
     header('Location: ../adminlogin.php');
     exit();
 }
+
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $departmentID = $_POST['departmentID'];
     $branchID = $_POST['branchID'];
@@ -19,27 +20,38 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $salary = $_POST['salary'];
     $hireDate = $_POST['hireDate'];
 
-     // Check if departmentID exists in the department table
-     $checkDepartmentQuery = "SELECT * FROM department WHERE departmentID = '$departmentID'";
-     $departmentResult = mysqli_query($conn, $checkDepartmentQuery);
- 
-     if (mysqli_num_rows($departmentResult) > 0) {
-         // Department exists, proceed with employee insertion
-         $query = "INSERT INTO employee (departmentID, branchID, firstName, lastName, email, phoneNumber, role, salary, hireDate)
-                   VALUES ('$departmentID', '$branchID','$firstName', '$lastName', '$email', '$phoneNumber', '$role', '$salary', '$hireDate')";
-         if (mysqli_query($conn, $query)) {
-             $message = "Employee added successfully.";
-             header("Location: ../manage_employees.php?message=" . urlencode($message));
-             exit();
-         } else {
-             $message = "Error adding employee: " . mysqli_error($conn);
-         }
-     } else {
-         $message = "Invalid Department ID. Please enter a valid department.";
-     }
+    // Check if departmentID exists in the department table
+    $checkDepartmentQuery = "SELECT * FROM department WHERE departmentID = '$departmentID'";
+    $departmentResult = mysqli_query($conn, $checkDepartmentQuery);
+
+    if (mysqli_num_rows($departmentResult) > 0) {
+        // Department exists, now check if branchID exists in the branch table
+        $checkBranchQuery = "SELECT * FROM branch WHERE branchID = '$branchID'";
+        $branchResult = mysqli_query($conn, $checkBranchQuery);
+
+        if (mysqli_num_rows($branchResult) > 0) {
+            // Branch exists, proceed with employee insertion
+            $query = "INSERT INTO employee (departmentID, branchID, firstName, lastName, email, phoneNumber, role, salary, hireDate)
+                      VALUES ('$departmentID', '$branchID','$firstName', '$lastName', '$email', '$phoneNumber', '$role', '$salary', '$hireDate')";
+            if (mysqli_query($conn, $query)) {
+                $message = "Employee added successfully.";
+                header("Location: ../manage_employees.php?message=" . urlencode($message));
+                exit();
+            } else {
+                $message = "Error adding employee: " . mysqli_error($conn);
+            }
+        } else {
+            // Branch does not exist
+            $message = "Invalid Branch ID. Please enter a valid branch.";
+        }
+    } else {
+        // Department does not exist
+        $message = "Invalid Department ID. Please enter a valid department.";
+    }
 }
 
 ?>
+
 
 <!DOCTYPE html>
 <html lang="en">
