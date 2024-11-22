@@ -1,6 +1,6 @@
 <?php
 session_start();
-include '../connection.php';
+include '../connection.php'; // Database connection
 
 // Check if admin is logged in
 if (!isset($_SESSION['admin_id'])) {
@@ -8,12 +8,12 @@ if (!isset($_SESSION['admin_id'])) {
     exit();
 }
 
-// Fetch all customers
-$result = mysqli_query($conn, "SELECT * FROM customer");
+// Fetch all transactions
+$result = mysqli_query($conn, "SELECT * FROM transaction");
 if (!$result) {
-    die("Error fetching customers: " . mysqli_error($conn));
+    die("Error fetching transactions: " . mysqli_error($conn));
 }
-$customers = mysqli_fetch_all($result, MYSQLI_ASSOC);
+$transactions = mysqli_fetch_all($result, MYSQLI_ASSOC);
 
 // Get message from query string
 $message = isset($_GET['message']) ? $_GET['message'] : '';
@@ -24,7 +24,7 @@ $message = isset($_GET['message']) ? $_GET['message'] : '';
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Manage Customers</title>
+    <title>All Transactions</title>
     <link rel="stylesheet" href="../css/adminpages.css">
     <style>
         .user-info h1{
@@ -89,6 +89,7 @@ $message = isset($_GET['message']) ? $_GET['message'] : '';
     </style>
 </head>
 <body>
+
     <div id="main">
         <!-- Header Section -->
         <header class="header">
@@ -108,54 +109,51 @@ $message = isset($_GET['message']) ? $_GET['message'] : '';
 
         <!-- Main Content -->
         <div class="user-info">
-            <h1>Customer Information</h1>
+            <h1>All Transactions</h1>
             <?php if (!empty($message)): ?>
                 <p style="color:green;" class="message"><?= htmlspecialchars($message); ?></p>
             <?php endif; ?>
 
             <!-- Action Buttons -->
             <div class="buttons">
-                <button onclick="window.location.href='CustomerManagement/create_user.php'">Insert New Customer</button>
+                <button onclick="window.location.href='TransactionManagement/create_tr.php'">Insert New Transaction</button>
             </div>
 
-            <!-- Customer Table -->
+            <!-- Transaction Table -->
             <table>
                 <thead>
                     <tr>
-                        <th>Customer ID</th>
-                        <th>Account ID</th>
-                        <th>Name</th>
-                        <th>Email</th>
-                        <th>Address</th>
-                        <th>Date of Birth</th>
-                        <th>Phone</th>
-                        <th>Actions</th>
+                    <th>Transaction ID</th>
+                    <th>Account ID</th>
+                    <th>Date</th>
+                    <th>Type</th>
+                    <th>Amount</th>
+                    <th>Action</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <?php foreach ($customers as $customer): ?>
-                        <tr>
-                            <td><?= htmlspecialchars($customer['customerId'] ?? 'N/A'); ?></td>
-                            <td><?= htmlspecialchars($customer['account_accountID'] ?? 'N/A'); ?></td>
-                            <td><?= htmlspecialchars($customer['Name'] ?? 'N/A'); ?></td>
-                            <td><?= htmlspecialchars($customer['Email'] ?? 'N/A'); ?></td>
-                            <td><?= htmlspecialchars($customer['Address'] ?? 'N/A'); ?></td>
-                            <td><?= htmlspecialchars($customer['DateOfBirth'] ?? 'N/A'); ?></td>
-                            <td><?= htmlspecialchars($customer['Phone'] ?? 'N/A'); ?></td>
-                            <td>
-                                <div class="action-buttons">
-                                    <button class="update" 
-                                        onclick="window.location.href='CustomerManagement/update_user.php?customer_id=<?= $customer['customerId']; ?>'">
-                                        Update
-                                    </button>
-                                    <button class="delete" 
-                                        onclick="if(confirm('Are you sure you want to delete this customer?')) 
-                                            window.location.href='CustomerManagement/delete_user.php?customer_id=<?= $customer['customerId']; ?>'">
-                                        Delete
-                                    </button>
-                                </div>
-                            </td>
-                        </tr>
+                    
+                    <?php foreach ($transactions as $transaction): ?>
+                    <tr>
+                        <td><?= htmlspecialchars($transaction['transactionID'] ?? 'N/A'); ?></td>
+                        <td><?= htmlspecialchars($transaction['account_AccountID'] ?? 'N/A'); ?></td>
+                        <td><?= htmlspecialchars($transaction['transactionDate'] ?? 'N/A'); ?></td>
+                        <td><?= htmlspecialchars($transaction['transactionType'] ?? 'N/A'); ?></td>
+                        <td><?= htmlspecialchars($transaction['transactionAmount'] ?? 'N/A'); ?></td>
+                        <td>
+                            <div class="action-buttons">
+                            <button class="update" 
+                                onclick="window.location.href='TransactionManagement/update_tr.php?transactionID=<?= $transaction['transactionID']; ?>'">
+                                Update
+                            </button>
+                            <button class="delete" 
+                                onclick="if(confirm('Are you sure you want to delete this transaction?')) 
+                                window.location.href='TransactionManagement/delete_tr.php?transactionID=<?= $transaction['transactionID']; ?>'">
+                                Delete
+                            </button>
+                            </div>
+                        </td>
+                    </tr>
                     <?php endforeach; ?>
                 </tbody>
             </table>

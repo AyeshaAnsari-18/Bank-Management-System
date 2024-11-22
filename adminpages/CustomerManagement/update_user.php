@@ -28,7 +28,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update'])) {
         // Update customer information in the database
         $sql = "UPDATE customer 
                 SET Name = '$name', Email = '$email', Address = '$address', 
-                    DateofBirth = '$dob', Phone = '$phone', UserPassword = '$password' 
+                    DateOfBirth = '$dob', Phone = '$phone', UserPassword = '$password' 
                 WHERE customerId = '$customerID' AND account_accountID = '$accountID'";
 
         if (mysqli_query($conn, $sql)) {
@@ -139,7 +139,7 @@ if ($customerID) {
             <nav class="nav-links">
                 <a href="../manage_users.php">Customer Management</a>
                 <a href="#">Employee Management</a>
-                <a href="#">Transaction Management</a>
+                <a href="../manage_transaction.php">Transaction Management</a>
                 <a href="../approve_loans.php">Loan Management</a>
                 <a href="#">Branch Management</a>
                 <a href="#">Customer Feedback Management</a>
