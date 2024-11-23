@@ -1,4 +1,4 @@
-<?php
+<?php 
 session_start();
 include '../connection.php';
 
@@ -8,15 +8,18 @@ if (!isset($_SESSION['admin_id'])) {
     exit();
 }
 
-// Fetch all customers
-$result = mysqli_query($conn, "SELECT * FROM branch");
+// Fetch all support requests
+$result = mysqli_query($conn, "SELECT cs.*, c.email FROM customer_support cs 
+                                INNER JOIN customer c 
+                                ON cs.customer_customerID = c.customerID ");
 if (!$result) {
-    die("Error fetching branches: " . mysqli_error($conn));
+    die("Error fetching support requests: " . mysqli_error($conn));
 }
-$branches = mysqli_fetch_all($result, MYSQLI_ASSOC);
+$support_requests = mysqli_fetch_all($result, MYSQLI_ASSOC);
 
-// Get message from query string
+// Message for actions
 $message = isset($_GET['message']) ? $_GET['message'] : '';
+$status = isset($_GET['status']) ? $_GET['status'] : '';
 ?>
 
 <!DOCTYPE html>
@@ -24,16 +27,21 @@ $message = isset($_GET['message']) ? $_GET['message'] : '';
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Manage Employees</title>
+    <title>Manage Customer Support</title>
     <link rel="stylesheet" href="../css/adminpages.css">
     <style>
-        .user-info h1{
+        .user-info h1 {
             font-size: 40px;
         }
         .message {
-            color: green;
             font-weight: bold;
             margin-bottom: 15px;
+        }
+        .message.success {
+            color: green;
+        }
+        .message.error {
+            color: red;
         }
         table {
             width: 100%;
@@ -49,20 +57,6 @@ $message = isset($_GET['message']) ? $_GET['message'] : '';
             background-color: #f4f4f4;
             font-weight: bold;
         }
-        .buttons {
-            margin: 15px 15px;
-            width: 20%;
-            height:40px;
-        }
-        .buttons button:hover {
-            background-color: rgb(28, 120, 211);
-            color: white;
-        }
-        .buttons button {
-            padding: 10px;
-            background-color: #032d60;
-            color: white;
-        }
         .action-buttons {
             display: flex;
             gap: 10px;
@@ -73,12 +67,7 @@ $message = isset($_GET['message']) ? $_GET['message'] : '';
             font-size: 14px;
             cursor: pointer;
         }
-        .action-buttons button.update {
-            background-color: darkblue;
-            color: white;
-            border: none;
-        }
-        .action-buttons button.delete {
+        .action-buttons button.respond {
             background-color: darkblue;
             color: white;
             border: none;
@@ -108,47 +97,47 @@ $message = isset($_GET['message']) ? $_GET['message'] : '';
 
         <!-- Main Content -->
         <div class="user-info">
-            <h1>Branch Information</h1>
+            <h1>Customer Support Information</h1>
+            <!-- Display Message -->
             <?php if (!empty($message)): ?>
-                <p style="color:green;" class="message"><?= htmlspecialchars($message); ?></p>
+                <p class="message <?= $status === 'success' ? 'success' : 'error'; ?>">
+                    <?= htmlspecialchars($message); ?>
+                </p>
             <?php endif; ?>
 
-            <!-- Action Buttons -->
-            <div class="buttons">
-                <button onclick="window.location.href='BranchManagement/create_branch.php'">Insert New Branch</button>
-            </div>
-
-            <!-- Customer Table -->
+            <!-- Support Requests Table -->
             <table>
                 <thead>
                     <tr>
-                        <th>Branch ID</th>
-                        <th>Branch Name</th>
-                        <th>Location</th>
-                        <th>Branch Manager ID</th>
-                        <th>Rating</th>
+                        <th>Support ID</th>
+                        <th>Customer ID</th>
+                        <th>Issue Type</th>
+                        <th>Description</th>
+                        <th>Email</th>
+                        <th>Status</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <?php foreach ($branches as $branch): ?>
+                    <?php foreach ($support_requests as $request): ?>
                         <tr>
-                            <td><?= htmlspecialchars($branch['branchID'] ?? 'N/A'); ?></td>
-                            <td><?= htmlspecialchars($branch['branchName'] ?? 'N/A'); ?></td>
-                            <td><?= htmlspecialchars($branch['location'] ?? 'N/A'); ?></td>
-                            <td><?= htmlspecialchars($branch['branchManagerID'] ?? 'N/A'); ?></td>
-                            <td><?= htmlspecialchars($branch['performanceRating'] ?? 'N/A'); ?></td>
+                            <td><?= htmlspecialchars($request['Support_id']); ?></td>
+                            <td><?= htmlspecialchars($request['customer_customerID']); ?></td>
+                            <td><?= htmlspecialchars($request['issue_type']); ?></td>
+                            <td><?= htmlspecialchars($request['description']); ?></td>
+                            <td><?= htmlspecialchars($request['email']); ?></td>
+                            <td><?= htmlspecialchars($request['status']); ?></td>
                             <td>
                                 <div class="action-buttons">
-                                    <button class="update" 
-                                        onclick="window.location.href='BranchManagement/update_branch.php?branchID=<?= $branch['branchID']; ?>'">
-                                        Update
-                                    </button>
-                                    <button class="delete" 
-                                        onclick="if(confirm('Are you sure you want to delete this branch?')) 
-                                            window.location.href='BranchManagement/delete_branch.php?branchID=<?= $branch['branchID']; ?>'">
-                                        Delete
-                                    </button>
+                                    <?php if ($request['status'] === 'Open'): ?>
+                                        <button class="respond" 
+                                            onclick="if(confirm('Are you sure you want to respond and close this ticket?')) 
+                                                window.location.href='CustomerSupportManagement/respond_support.php?Support_id=<?= $request['Support_id']; ?>'">
+                                            Respond and Close
+                                        </button>
+                                    <?php else: ?>
+                                        <span>Closed</span>
+                                    <?php endif; ?>
                                 </div>
                             </td>
                         </tr>

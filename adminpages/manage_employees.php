@@ -99,9 +99,9 @@ $message = isset($_GET['message']) ? $_GET['message'] : '';
                 <a href="manage_users.php">Customer Management</a>
                 <a href="manage_employees.php">Employee Management</a>
                 <a href="manage_transaction.php">Transaction Management</a>
-                <a href="approve_loans.php">Loan Management</a>
+                <a href="manage_loan.php">Loan Management</a>
                 <a href="manage_branch.php">Branch Management</a>
-                <a href="#">Customer Feedback Management</a>
+                <a href="manage_support.php">Customer Feedback Management</a>
                 <a href="adminlogin.html">Logout</a>
             </nav>
         </header>

@@ -2,8 +2,8 @@
 session_start();
 
 // Debugging: Check if the session exists
-if (isset($_SESSION['user_id'])) {
-    error_log("Logging out user with ID: " . $_SESSION['user_id']);
+if (isset($_SESSION['admin_id'])) {
+    error_log("Logging out user with ID: " . $_SESSION['admin_id']);
 } else {
     error_log("No active session found.");
 }
@@ -25,6 +25,6 @@ if (session_status() === PHP_SESSION_NONE) {
 }
 
 // Redirect to login with a success message
-header("Location: ../login.html?message=logout_success");
+header("Location: adminlogin.php?message=logout_success");
 exit();
 ?>

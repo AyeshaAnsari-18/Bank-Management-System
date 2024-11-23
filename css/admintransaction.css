@@ -1,0 +1,159 @@
+/* Reset and General Styling */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Gill Sans', sans-serif;
+}
+
+html, body {
+    height: 100%;
+    width: 100%;
+}
+
+/* Body Styling */
+body {
+    margin: 0;
+    padding: 0;
+    height: 100vh;
+    overflow: hidden; /* Prevent body scrolling */
+    display: flex;
+    flex-direction: column;
+    font-family: Arial, sans-serif;
+    background-color: whitesmoke;
+}
+
+/* Main Content Wrapper */
+#main {
+    display: flex;
+    height: 100%;
+    width: 100%;
+    background-color: whitesmoke;
+}
+
+/* Header Section */
+.header {
+    position: fixed; /* Fix header on the left */
+    top: 0;
+    left: 0;
+    width: 20%; /* Sidebar width */
+    height: 100%;
+    background-color: whitesmoke;
+    display: flex;
+    flex-direction: column; /* Align logo and links vertically */
+    align-items: center;
+    padding-top: 20px; /* Padding at the top */
+    border-right: 1px solid #ccc; /* Add dividing line */
+    z-index: 1000;
+    box-shadow: 2px 0 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Bank Logo Styling */
+#logo {
+    width: 90%;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+#logo img {
+    width: 100%; /* Fit logo to the header */
+    height: auto;
+    object-fit: contain;
+}
+
+/* Navigation Links Styling */
+.nav-links {
+    display: flex;
+    flex-direction: column; /* Stack links vertically */
+    align-items: flex-start; /* Align links to the left */
+    gap: 25px;
+    margin-top: 20px;
+    padding-left: 20px; /* Padding for spacing */
+}
+
+.nav-links a {
+    color: #032D60;
+    font-weight: bold;
+    text-decoration: none;
+    font-size: 16px;
+    text-align: left;
+}
+
+.nav-links a:hover {
+    color: rgb(38, 152, 212);
+}
+
+/* Right Content Section */
+.user-info {
+    flex: 1;
+    margin-left: 20%; /* Offset for fixed sidebar */
+    background-color: white;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    text-align: center;
+    color: #032D60;
+    padding: 40px;
+    height: calc(100vh - 40px);
+    overflow-y: auto;
+}
+
+.user-info h1 {
+    font-weight: bold;
+    font-size: 24px;
+}
+
+.user-info p {
+    font-size: 18px;
+    margin-top: 10px;
+    color: #181818;
+}
+
+/* Account Details Styling */
+.account-details {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-top: 20px;
+}
+
+.detail-card {
+    width: 250px;
+    margin: 15px;
+    padding: 20px;
+    background-color: #f7f7f7;
+    border-radius: 10px;
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+.detail-card h3 {
+    color: #032D60;
+    font-size: 18px;
+    margin-bottom: 10px;
+}
+
+.detail-card p {
+    font-size: 20px;
+    font-weight: bold;
+    color: #181818;
+}
+
+/* Table Styling */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+table th, table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: center;
+}
+
+table th {
+    background-color: #f4f4f4;
+    font-weight: bold;
+}
