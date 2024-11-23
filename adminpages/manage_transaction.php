@@ -24,8 +24,8 @@ $message = isset($_GET['message']) ? $_GET['message'] : '';
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>All Transactions</title>
-    <link rel="stylesheet" href="../css/adminpages.css">
+    <title>Manage Transactions</title>
+    <link rel="stylesheet" href="../css/admintransaction.css">
     <style>
         .user-info h1{
             font-size: 40px;
@@ -74,17 +74,18 @@ $message = isset($_GET['message']) ? $_GET['message'] : '';
             cursor: pointer;
         }
         .action-buttons button.update {
-            background-color: darkblue;
+            background-color: #032d60;
             color: white;
             border: none;
         }
         .action-buttons button.delete {
-            background-color: darkblue;
+            background-color: #032d60;
             color: white;
             border: none;
         }
         .action-buttons button:hover {
             opacity: 0.8;
+            background-color: rgb(38, 152, 212);
         }
     </style>
 </head>
@@ -100,16 +101,16 @@ $message = isset($_GET['message']) ? $_GET['message'] : '';
                 <a href="manage_users.php">Customer Management</a>
                 <a href="manage_employees.php">Employee Management</a>
                 <a href="manage_transaction.php">Transaction Management</a>
-                <a href="approve_loans.php">Loan Management</a>
+                <a href="manage_loan.php">Loan Management</a>
                 <a href="manage_branch.php">Branch Management</a>
-                <a href="#">Customer Feedback Management</a>
+                <a href="manage_support.php">Customer Feedback Management</a>
                 <a href="adminlogin.html">Logout</a>
             </nav>
         </header>
 
         <!-- Main Content -->
         <div class="user-info">
-            <h1>All Transactions</h1>
+            <h1>Transactions Information</h1>
             <?php if (!empty($message)): ?>
                 <p style="color:green;" class="message"><?= htmlspecialchars($message); ?></p>
             <?php endif; ?>

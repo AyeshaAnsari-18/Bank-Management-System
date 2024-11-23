@@ -74,17 +74,18 @@ $message = isset($_GET['message']) ? $_GET['message'] : '';
             cursor: pointer;
         }
         .action-buttons button.update {
-            background-color: darkblue;
+            background-color: #032d60;
             color: white;
             border: none;
         }
         .action-buttons button.delete {
-            background-color: darkblue;
+            background-color: #032d60;
             color: white;
             border: none;
         }
         .action-buttons button:hover {
             opacity: 0.8;
+            background-color: rgb(38, 152, 212);
         }
     </style>
 </head>
@@ -99,9 +100,9 @@ $message = isset($_GET['message']) ? $_GET['message'] : '';
                 <a href="manage_users.php">Customer Management</a>
                 <a href="manage_employees.php">Employee Management</a>
                 <a href="manage_transaction.php">Transaction Management</a>
-                <a href="approve_loans.php">Loan Management</a>
+                <a href="manage_loan.php">Loan Management</a>
                 <a href="manage_branch.php">Branch Management</a>
-                <a href="#">Customer Feedback Management</a>
+                <a href="manage_support.php">Customer Feedback Management</a>
                 <a href="adminlogin.html">Logout</a>
             </nav>
         </header>
