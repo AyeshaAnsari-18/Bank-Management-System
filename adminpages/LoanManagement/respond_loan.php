@@ -2,20 +2,18 @@
 session_start();
 include '../../connection.php';
 
-// Include PHPMailer namespaces
 require '../../PHPMailer/src/Exception.php';
 require '../../PHPMailer/src/PHPMailer.php';
 require '../../PHPMailer/src/SMTP.php';
 
 use PHPMailer\PHPMailer\PHPMailer;
-use PHPMailer\PHPMailer\Exception;
 
 if (!isset($_SESSION['admin_id'])) {
     header('Location: ../adminlogin.php');
     exit();
 }
 
-// Validate `loan_id` parameter
+// Validate and sanitize `loan_id` parameter
 if (!isset($_GET['loan_id']) || !is_numeric($_GET['loan_id']) || intval($_GET['loan_id']) <= 0) {
     header('Location: ../manage_loan.php?message=Invalid loan ID.');
     exit();
@@ -69,12 +67,12 @@ if ($result->num_rows > 0) {
         $mail->isSMTP();
         $mail->Host = 'smtp.gmail.com';
         $mail->SMTPAuth = true;
-        $mail->Username = getenv('SMTP_USER');
-        $mail->Password = getenv('SMTP_PASS');
+        $mail->Username = 'itsa.ansari@gmail.com';
+        $mail->Password = 'jubjhrtppgotstfp';
         $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
         $mail->Port = 587;
 
-        $mail->setFrom('support@aegisbank.com', 'Aegis Bank Support');
+        $mail->setFrom('itsa.ansari@gmail.com', 'Aegis Bank Support');
         $mail->addAddress($email);
 
         $mail->isHTML(true);
@@ -100,5 +98,6 @@ if ($result->num_rows > 0) {
     header('Location: ../manage_loan.php?message=Loan not found.');
     exit();
 }
+
 $conn->close();
 ?>

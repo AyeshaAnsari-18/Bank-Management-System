@@ -30,19 +30,28 @@ $status = isset($_GET['status']) ? $_GET['status'] : '';
     <title>Manage Customer Support</title>
     <link rel="stylesheet" href="../css/adminpages.css">
     <style>
+        /* General Page Styling */
         .user-info h1 {
             font-size: 40px;
         }
+        /* Message Styling */
         .message {
             font-weight: bold;
             margin-bottom: 15px;
+            padding: 10px;
+            border-radius: 5px;
         }
         .message.success {
             color: green;
+            background-color: #e6ffee;
+            border: 1px solid #c3e6cb;
         }
         .message.error {
             color: red;
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
         }
+        /* Table Styling */
         table {
             width: 100%;
             border-collapse: collapse;
@@ -57,6 +66,7 @@ $status = isset($_GET['status']) ? $_GET['status'] : '';
             background-color: #f4f4f4;
             font-weight: bold;
         }
+        /* Action Buttons Styling */
         .action-buttons {
             display: flex;
             gap: 10px;
@@ -66,14 +76,18 @@ $status = isset($_GET['status']) ? $_GET['status'] : '';
             padding: 5px 10px;
             font-size: 14px;
             cursor: pointer;
-        }
-        .action-buttons button.respond {
-            background-color: darkblue;
+            background-color: #032d60;
             color: white;
             border: none;
+            border-radius: 5px;
         }
         .action-buttons button:hover {
             opacity: 0.8;
+            background-color: rgb(38, 152, 212);
+        }
+        .action-buttons span {
+            color: grey;
+            font-size: 14px;
         }
     </style>
 </head>
@@ -85,13 +99,14 @@ $status = isset($_GET['status']) ? $_GET['status'] : '';
                 <img src="../logo.png" alt="Bank Logo">
             </div>
             <nav class="nav-links">
+                <a href="adminhome.php">Home</a>
                 <a href="manage_users.php">Customer Management</a>
                 <a href="manage_employees.php">Employee Management</a>
                 <a href="manage_transaction.php">Transaction Management</a>
                 <a href="manage_loan.php">Loan Management</a>
                 <a href="manage_branch.php">Branch Management</a>
                 <a href="manage_support.php">Customer Feedback Management</a>
-                <a href="adminlogin.html">Logout</a>
+                <a href="admin_logout.php">Logout</a>
             </nav>
         </header>
 
