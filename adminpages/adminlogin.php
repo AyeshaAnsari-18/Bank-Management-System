@@ -5,6 +5,24 @@
    <meta name="viewport" content="width=device-width, initial-scale=1.0">
    <title>Admin Login</title>
    <link rel="stylesheet" href="../css/adminlogin.css">
+   <style>
+    .message {
+        font-weight: bold;
+        margin-bottom: 15px;
+        padding: 10px;
+        border-radius: 5px;
+    }
+    .message.success {
+        color: green;
+        background-color: #e6ffee;
+        border: 1px solid #c3e6cb;
+    }
+    .message.error {
+        color: red;
+        background-color: #f8d7da;
+        border: 1px solid #f5c6cb;
+    }
+   </style>
 </head>
 <body>
 <div class="container">
@@ -17,6 +35,11 @@
             <div class="title">
                 <span id="formTitle">Login Form</span>
             </div>
+            <?php if (isset($_GET['message']) && isset($_GET['type'])): ?>
+                <p class="message <?= $_GET['type'] === 'success' ? 'success' : 'error'; ?>">
+                    <?= htmlspecialchars($_GET['message']); ?>
+                </p>
+            <?php endif; ?>
             
             <form action="adminlogin_api.php" method="POST" style="display: block;">
                 <!-- Admin ID -->

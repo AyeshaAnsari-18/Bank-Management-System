@@ -96,13 +96,14 @@ $message = isset($_GET['message']) ? $_GET['message'] : '';
                 <img src="../logo.png" alt="Bank Logo">
             </div>
             <nav class="nav-links">
+                <a href="adminhome.php">Home</a>
                 <a href="manage_users.php">Customer Management</a>
                 <a href="manage_employees.php">Employee Management</a>
                 <a href="manage_transaction.php">Transaction Management</a>
                 <a href="manage_loan.php">Loan Management</a>
                 <a href="manage_branch.php">Branch Management</a>
                 <a href="manage_support.php">Customer Feedback Management</a>
-                <a href="adminlogin.html">Logout</a>
+                <a href="admin_logout.php">Logout</a>
             </nav>
         </header>
 

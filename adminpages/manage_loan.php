@@ -7,7 +7,7 @@ if (!isset($_SESSION['admin_id'])) {
     exit();
 }
 
-// Fetch all loans with proper SQL query
+// Fetch all loans with a proper SQL query
 $result = $conn->query("SELECT LoanId, a_AccountID, LoanType, Amount, InterestRate, Status FROM loan");
 if (!$result) {
     die("Error fetching loans: " . $conn->error);
@@ -24,8 +24,8 @@ $conn->close();
     <title>Loan Management</title>
     <link rel="stylesheet" href="../css/adminpages.css">
     <style>
-         /* General Table Styling */
-         table {
+        /* General Table Styling */
+        table {
             width: 100%;
             border-collapse: collapse;
             margin-top: 20px;
@@ -43,35 +43,23 @@ $conn->close();
         }
 
         /* User Info Styling */
-        .user-info h1 {
-            font-size: 40px;
+        .user-info h2 {
+            font-size: 30px;
+            margin-top: 20px;
         }
 
         /* Message Styling */
         .message {
-            color: green;
             font-weight: bold;
             margin-bottom: 15px;
         }
 
-        /* Buttons Section Styling */
-        .buttons {
-            margin: 15px 15px;
-            width: 20%;
-            height: 40px;
+        .message.success {
+            color: green;
         }
 
-        .buttons button {
-            padding: 10px;
-            background-color: #032d60;
-            color: white;
-            border: none;
-            cursor: pointer;
-        }
-
-        .buttons button:hover {
-            background-color: rgb(28, 120, 211);
-            color: white;
+        .message.error {
+            color: red;
         }
 
         /* Action Buttons Styling */
@@ -86,8 +74,8 @@ $conn->close();
             font-size: 14px;
             cursor: pointer;
             border: none;
-            color:white;
             background-color: #032d60;
+            color: white;
         }
 
         .action-buttons button.update {
@@ -114,23 +102,26 @@ $conn->close();
             <img src="../logo.png" alt="Bank Logo">
         </div>
         <nav class="nav-links">
+            <a href="adminhome.php">Home</a>
             <a href="manage_users.php">Customer Management</a>
             <a href="manage_employees.php">Employee Management</a>
             <a href="manage_transaction.php">Transaction Management</a>
             <a href="manage_loan.php">Loan Management</a>
             <a href="manage_branch.php">Branch Management</a>
             <a href="manage_support.php">Customer Feedback Management</a>
-            <a href="adminlogin.html">Logout</a>
+            <a href="admin_logout.php">Logout</a>
         </nav>
     </header>
     <div class="user-info">
-        <h1>Loans Information</h1>
-        <!-- Display messages -->
+        <h2>Loans Information</h2>
+        <!-- Display Messages -->
         <?php if (isset($_GET['message'])): ?>
-            <p class="message"><?= htmlspecialchars($_GET['message']); ?></p>
+            <?php 
+                // Check for success or error message
+                $messageType = isset($_GET['type']) && $_GET['type'] === 'error' ? 'error' : 'success';
+            ?>
+            <p class="message <?= $messageType; ?>"><?= htmlspecialchars($_GET['message']); ?></p>
         <?php endif; ?>
-
-        <!-- Loans Table -->
         <table>
             <thead>
                 <tr>
