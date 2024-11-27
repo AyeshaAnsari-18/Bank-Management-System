@@ -175,6 +175,7 @@ for ($month = 1; $month <= 12; $month++) {
                 <a href="manage_branch.php">Branch Management</a>
                 <a href="manage_support.php">Customer Feedback Management</a>
                 <a href="manage_reports.php">Reports and Analytics</a>
+                <a href="manage_audit_logs.php">Audit Logs</a>
                 <a href="admin_logout.php">Logout</a>
             </nav>
         </header>
