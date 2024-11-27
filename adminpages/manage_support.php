@@ -106,6 +106,7 @@ $status = isset($_GET['status']) ? $_GET['status'] : '';
                 <a href="manage_loan.php">Loan Management</a>
                 <a href="manage_branch.php">Branch Management</a>
                 <a href="manage_support.php">Customer Feedback Management</a>
+                <a href="manage_reports.php">Reports and Analytics</a>
                 <a href="admin_logout.php">Logout</a>
             </nav>
         </header>
