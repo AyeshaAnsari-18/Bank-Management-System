@@ -241,7 +241,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 </head>
 <body>
 
-<div id="main" style="height: 90%;">
+<div id="main" style="height: 88%;">
     <!-- Header Section -->
     <header id="header">
         <div id="logo">

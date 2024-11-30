@@ -21,7 +21,7 @@ if (!isset($_SESSION['customerId'])) {
 <body>
 
 <!-- Main container -->
-<div id="main">
+<div id="main" style="height: 92%;">
     <!-- Header Section -->
     <header id="header">
         <!-- Bank Logo -->
