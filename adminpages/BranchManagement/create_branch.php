@@ -10,7 +10,6 @@ if (!isset($_SESSION['admin_id'])) {
 }
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $branchID = $_POST['branchID'];
     $branchName = $_POST['branchName'];
     $location = $_POST['location'];
     $branchManagerID = $_POST['branchManagerID'];
@@ -18,11 +17,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     if (is_numeric($performanceRating) && $performanceRating >= 0 && $performanceRating <= 5) {
         // Check if the branchManagerID exists in the employee table
+        if($branchManagerID!=NULL){
         $checkManagerQuery = "SELECT * FROM employee WHERE employeeID = '$branchManagerID'";
         $managerResult = mysqli_query($conn, $checkManagerQuery);
 
         if (mysqli_num_rows($managerResult) > 0) {
-            // Manager exists, proceed with branch insertion
+            // Manager exists, proceed with branch insertions
             $query = "INSERT INTO branch (branchName, location, branchManagerID, performanceRating)
                     VALUES ('$branchName', '$location', '$branchManagerID', '$performanceRating')";
             
@@ -36,6 +36,17 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         } else {
             $message = "Invalid Branch Manager ID. Please enter a valid employee ID.";
         }
+        }
+        $query = "INSERT INTO branch (branchName, location,  performanceRating)
+                    VALUES ('$branchName', '$location', '$performanceRating')";
+            
+        if (mysqli_query($conn, $query)) {
+            $message = "Branch added successfully.";
+            header("Location: ../manage_branch.php?message=" . urlencode($message));
+            exit();
+        } else {
+            $message = "Error adding branch: " . mysqli_error($conn);
+            }
     }
     else {
         $message = "Performance Rating must be a number between 1 and 5.";
@@ -125,7 +136,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 <a href="../manage_transaction.php">Transaction Management</a>
                 <a href="../approve_loans.php">Loan Management</a>
                 <a href="../manage_branch.php">Branch Management</a>
-                <a href="#">Customer Feedback Management</a>
+                <a href="../manage_support.php">Customer Feedback Management</a>
                 <a href="adminlogin.html">Logout</a>
             </nav>
         </header>
@@ -146,7 +157,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     </div>
                     <div>
                         <label for="branchManagerID">Branch Manager ID</label>
-                        <input type="text" id="branchManagerID" name="branchManagerID" required>
+                        <input type="text" id="branchManagerID" name="branchManagerID" >
                     </div>
                     <div>
                         <label for="performanceRating">Performance Rating (1 to 5)</label>
