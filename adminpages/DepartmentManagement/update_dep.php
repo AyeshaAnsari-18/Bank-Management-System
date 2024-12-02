@@ -12,46 +12,61 @@ if (!isset($_SESSION['admin_id'])) {
 // Handle form submissions for Update operation
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update'])) {
     // Fetch and sanitize input
-    $branchID = mysqli_real_escape_string($conn, $_POST['branchID']);
-    $branchName = mysqli_real_escape_string($conn, $_POST['branchName']);
-    $location = mysqli_real_escape_string($conn, $_POST['location']);
-    $branchManagerID = mysqli_real_escape_string($conn, $_POST['branchManagerID']);
-    $performanceRating = mysqli_real_escape_string($conn, $_POST['performanceRating']);
+    $departmentID = mysqli_real_escape_string($conn, $_POST['departmentID']);
+    $departmentName = mysqli_real_escape_string($conn, $_POST['departmentName']);
+    $managerID = mysqli_real_escape_string($conn, $_POST['managerID']);
 
-    // Validate if the branchManagerID exists in the employee table
-    $checkManagerQuery = "SELECT * FROM employee WHERE employeeID = '$branchManagerID'";
-    $managerResult = mysqli_query($conn, $checkManagerQuery);
+    if($managerID !=NULL){
+        // Validate if the branchManagerID exists in the employee table
+        $checkManagerQuery = "SELECT * FROM employee WHERE employeeID = '$managerID'";
+        $managerResult = mysqli_query($conn, $checkManagerQuery);
 
-    if (mysqli_num_rows($managerResult) > 0) {
-        // Proceed with branch update
-        $queryUpdate = "UPDATE branch SET branchName = '$branchName', location = '$location', 
-                        branchManagerID = '$branchManagerID', performanceRating = '$performanceRating'
-                        WHERE branchID = '$branchID'";
-        
-        if (mysqli_query($conn, $queryUpdate)) {
-            if (mysqli_affected_rows($conn) > 0) {
-                // Redirect to manage_branch.php after successful update
-                header("Location: ../manage_branch.php?message=" . urlencode("Branch updated successfully."));
-                exit();
+        if (mysqli_num_rows($managerResult) > 0) {
+            // Proceed with branch update
+            $queryUpdate = "UPDATE department SET departmentName = '$departmentName',
+                            managerID = '$managerID' WHERE departmentID = '$departmentID'";
+            
+            if (mysqli_query($conn, $queryUpdate)) {
+                if (mysqli_affected_rows($conn) > 0) {
+                    // Redirect to manage_branch.php after successful update
+                    header("Location: ../manage_department.php?message=" . urlencode("Department updated successfully."));
+                    exit();
+                } else {
+                    $message = "No changes made or invalid Department ID.";
+                }
             } else {
-                $message = "No changes made or invalid Branch ID.";
+                $message = "Error updating department: " . mysqli_error($conn);
             }
         } else {
-            $message = "Error updating branch: " . mysqli_error($conn);
+            $message = "Invalid Manager ID. Please enter a valid employee ID.";
         }
-    } else {
-        $message = "Invalid Branch Manager ID. Please enter a valid employee ID.";
+    }
+    else{
+        $queryUpdate = "UPDATE department SET departmentName = '$departmentName',
+                            managerID = NULL WHERE departmentID = '$departmentID'";
+            
+            if (mysqli_query($conn, $queryUpdate)) {
+                if (mysqli_affected_rows($conn) > 0) {
+                    // Redirect to manage_branch.php after successful update
+                    header("Location: ../manage_department.php?message=" . urlencode("Department updated successfully."));
+                    exit();
+                } else {
+                    $message = "No changes made or invalid Department ID.";
+                }
+            } else {
+                $message = "Error updating department: " . mysqli_error($conn);
+            }
     }
 }
 
 // Fetch branch details to populate the form
-$branchID = isset($_GET['branchID']) ? mysqli_real_escape_string($conn, $_GET['branchID']) : '';
-$branch = null;
+$departmentID = isset($_GET['departmentID']) ? mysqli_real_escape_string($conn, $_GET['departmentID']) : '';
+$department = null;
 
-if ($branchID) {
-    $result = mysqli_query($conn, "SELECT * FROM branch WHERE branchID = '$branchID'");
+if ($departmentID) {
+    $result = mysqli_query($conn, "SELECT * FROM department WHERE departmentID = '$departmentID'");
     if ($result) {
-        $branch = mysqli_fetch_assoc($result);
+        $department = mysqli_fetch_assoc($result);
     } else {
         $message = "Error fetching branch details: " . mysqli_error($conn);
     }
@@ -140,41 +155,33 @@ if ($branchID) {
                 <a href="../manage_transaction.php">Transaction Management</a>
                 <a href="../approve_loans.php">Loan Management</a>
                 <a href="../manage_branch.php">Branch Management</a>
-                <a href="../manage_department.php">Department Management</a>
                 <a href="../manage_support.php">Customer Feedback Management</a>
+                <a href="../manage_department.php">Department Management</a>
                 <a href="adminlogin.html">Logout</a>
             </nav>
         </header>
         <div class="user-info">
             <div class="card">
-                <h2>Update Employee</h2>
+                <h2>Update Department</h2>
                 <?php if (!empty($message)): ?>
                     <p class="message"><?= htmlspecialchars($message); ?></p>
                 <?php endif; ?>
                 <form class="form" method="POST" action="">
-                <?php if ($branch): ?>
+                <?php if ($department): ?>
                 <form class="form" method="POST" action="">
-                    <input type="hidden" name="branchID" value="<?= htmlspecialchars($branch['branchID']); ?>">
+                    <input type="hidden" name="departmentID" value="<?= htmlspecialchars($department['departmentID']); ?>">
                     <div>
-                        <label for="branchName">Branch Name</label>
-                        <input type="text" id="branchName" name="branchName" value="<?= htmlspecialchars($branch['branchName']); ?>" required>
+                        <label for="departmentName">Department Name</label>
+                        <input type="text" id="departmentName" name="departmentName" value="<?= htmlspecialchars($department['departmentName']); ?>" required>
                     </div>
                     <div>
-                        <label for="location">Location</label>
-                        <input type="text" id="location" name="location" value="<?= htmlspecialchars($branch['location']); ?>" required>
+                        <label for="managerID">Manager ID</label>
+                        <input type="text" id="managerID" name="managerID" value="<?= htmlspecialchars($department['managerID']); ?>">
                     </div>
-                    <div>
-                        <label for="branchManagerID">Branch Manager ID</label>
-                        <input type="text" id="branchManagerID" name="branchManagerID" value="<?= htmlspecialchars($branch['branchManagerID']); ?>" required>
-                    </div>
-                    <div>
-                        <label for="performanceRating">Performance Rating (1 to 5)</label>
-                        <input type="number" id="performanceRating" name="performanceRating" step="0.1" min="1" max="5" value="<?= htmlspecialchars($branch['performanceRating']); ?>" required>
-                    </div>
-                    <button type="submit" name="update">Update Branch</button>
+                    <button type="submit" name="update">Update department</button>
                 </form>
                 <?php else: ?>
-                    <p class="message">No branch found.</p>
+                    <p class="message">No department found.</p>
                 <?php endif; ?>
             </div>
         </div>

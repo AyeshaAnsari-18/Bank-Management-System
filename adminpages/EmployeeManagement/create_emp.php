@@ -45,7 +45,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     $message = "Invalid Branch ID. Please enter a valid branch.";
                 }
             }
-        $query = "INSERT INTO employee (departmentID, firstName, lastName, email, phoneNumber, role, salary, hireDate)
+            else{
+                $query = "INSERT INTO employee (departmentID, firstName, lastName, email, phoneNumber, role, salary, hireDate)
                             VALUES ('$departmentID','$firstName', '$lastName', '$email', '$phoneNumber', '$role', '$salary', '$hireDate')";
                 if (mysqli_query($conn, $query)) {
                     $message = "Employee added successfully.";
@@ -54,6 +55,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 } else {
                     $message = "Error adding employee: " . mysqli_error($conn);
                 }
+            }
             }
      else {
         // Department does not exist
@@ -145,7 +147,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 <a href="../manage_transaction.php">Transaction Management</a>
                 <a href="../approve_loans.php">Loan Management</a>
                 <a href="../manage_branch.php">Branch Management</a>
-                <a href="#">Customer Feedback Management</a>
+                <a href="../manage_support.php">Customer Feedback Management</a>
+                <a href="../manage_department.php">Department Management</a>
                 <a href="adminlogin.html">Logout</a>
             </nav>
         </header>

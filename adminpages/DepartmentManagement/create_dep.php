@@ -9,41 +9,40 @@ if (!isset($_SESSION['admin_id'])) {
     exit();
 }
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create'])) {
-    // Sanitize input
-    $account_type = mysqli_real_escape_string($conn, $_POST['account_type']);
-    $balance = $_POST['balance'];
-    $name = mysqli_real_escape_string($conn, $_POST['name']);
-    $email = mysqli_real_escape_string($conn, $_POST['email']);
-    $address = mysqli_real_escape_string($conn, $_POST['address']);
-    $dob = mysqli_real_escape_string($conn, $_POST['dob']);
-    $phone = $_POST['phone'];
-    $password = mysqli_real_escape_string($conn, $_POST['password']);
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    $managerID = $_POST['managerID'];
+    $departmentName = $_POST['departmentName'];
+    if($managerID!=NULL){
+        $checkManagerQuery = "SELECT * FROM employee WHERE employeeID = '$managerID'";
+        $managerResult = mysqli_query($conn, $checkManagerQuery);
 
-    // Insert into `account` table
-    $account_sql = "INSERT INTO account (AccountType, Balance) VALUES ('$account_type', '$balance')";
-    if (mysqli_query($conn, $account_sql)) {
-        $accountID = mysqli_insert_id($conn); // Get last inserted account ID
-
-        // Check if account ID was retrieved
-        if ($accountID) {
-            // Insert into `customer` table
-            $customer_sql = "INSERT INTO customer (account_accountID, Name, Email, Address, DateOfBirth, Phone, UserPassword) 
-                             VALUES ('$accountID', '$name', '$email', '$address', '$dob', '$phone', '$password')";
-            if (mysqli_query($conn, $customer_sql)) {
-                $message = "User created successfully.";
-                header("Location: ../manage_users.php?message=" . urlencode($message));
+        if (mysqli_num_rows($managerResult) > 0) {
+            // Manager exists, proceed with branch insertions
+            $query = "INSERT INTO department (departmentName, managerID)VALUES ('$departmentName', '$managerID')";
+            
+            if (mysqli_query($conn, $query)) {
+                $message = "Department added successfully.";
+                header("Location: ../manage_department.php?message=" . urlencode($message));
                 exit();
             } else {
-                $message = "Error inserting customer: " . mysqli_error($conn);
+                $message = "Error adding department: " . mysqli_error($conn);
             }
         } else {
-            $message = "Failed to retrieve account ID.";
+            $message = "Invalid Manager ID. Please enter a valid employee ID.";
         }
-    } else {
-        $message = "Error inserting account: " . mysqli_error($conn);
     }
-}
+        else{
+            $query = "INSERT INTO department(departmentName) VALUES ('$departmentName')";
+            
+        if (mysqli_query($conn, $query)) {
+            $message = "Department added successfully.";
+            header("Location: ../manage_department.php?message=" . urlencode($message));
+            exit();
+        } else {
+            $message = "Error adding department: " . mysqli_error($conn);
+            }
+        }
+    }
 ?>
 
 <!DOCTYPE html>
@@ -51,7 +50,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create'])) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Create Customer</title>
+    <title>Create Department</title>
     <link rel="stylesheet" href="../../css/adminpages.css">
     <style>
         body {
@@ -71,7 +70,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create'])) {
         .card h2 {
             margin-bottom: 20px;
             font-size: 24px;
-            color: #333;
+            color: darkblue;
             text-align: center;
         }
         .form {
@@ -134,44 +133,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create'])) {
         </header>
         <div class="user-info">
             <div class="card">
-                <h2>Create Customer</h2>
+                <h2>Add Department</h2>
                 <?php if (!empty($message)): ?>
                     <p class="message"><?= htmlspecialchars($message); ?></p>
                 <?php endif; ?>
                 <form class="form" method="POST" action="">
                     <div>
-                        <label for="account_type">Account Type</label>
-                        <input type="text" id="account_type" name="account_type" required>
+                        <label for="departmentName">Department Name</label>
+                        <input type="text" id="departmentName" name="departmentName" required>
                     </div>
                     <div>
-                        <label for="balance">Balance</label>
-                        <input type="number" id="balance" name="balance" required>
+                        <label for="managerID">Manager ID</label>
+                        <input type="text" id="managerID" name="managerID" >
                     </div>
-                    <div>
-                        <label for="name">Name</label>
-                        <input type="text" id="name" name="name" required>
-                    </div>
-                    <div>
-                        <label for="email">Email</label>
-                        <input type="email" id="email" name="email" required>
-                    </div>
-                    <div>
-                        <label for="address">Address</label>
-                        <input type="text" id="address" name="address" required>
-                    </div>
-                    <div>
-                        <label for="dob">Date of Birth</label>
-                        <input type="date" id="dob" name="dob" required>
-                    </div>
-                    <div>
-                        <label for="phone">Phone</label>
-                        <input type="tel" id="phone" name="phone" required>
-                    </div>
-                    <div>
-                        <label for="password">Password</label>
-                        <input type="password" id="password" name="password" required>
-                    </div>
-                    <button type="submit" name="create">Create Customer</button>
+                    <button type="submit" name="create">Add Department</button>
                 </form>
             </div>
         </div>
