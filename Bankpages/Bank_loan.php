@@ -138,8 +138,8 @@ if (!isset($_SESSION['AccountId'])) {
                                     <td><?= htmlspecialchars($loan['Amount']) ?></td>
                                     <td><?= htmlspecialchars($loan['InterestRate']) ?></td>
                                     <td>
-                                        <!-- Display "Pending" for Status = 1 -->
-                                        <?= $loan['Status'] == 1 ? "Pending" : htmlspecialchars($loan['Status']) ?>
+                                        <!-- Display "Pending" for Status = 1 & "Approved" fpr Status = 0 -->
+                                        <?= $loan['Status'] == 1 ? "Pending" : ($loan['Status'] == 0 ? "Approved" : htmlspecialchars($loan['Status'])) ?>
                                     </td>
                                     <td><?= htmlspecialchars($loan['StartDate']) ?></td>
                                     <td><?= htmlspecialchars($loan['EndDate']) ?></td>

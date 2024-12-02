@@ -73,7 +73,7 @@ header("Pragma: no-cache");
 </head>
 <body>
 <!-- Main container -->
-<div id="main">
+<div id="main" style="height:auto;">
     <!-- Header Section -->
     <header id="header">
         <div id="logo">

@@ -23,28 +23,39 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     // Check if departmentID exists in the department table
     $checkDepartmentQuery = "SELECT * FROM department WHERE departmentID = '$departmentID'";
     $departmentResult = mysqli_query($conn, $checkDepartmentQuery);
-
-    if (mysqli_num_rows($departmentResult) > 0) {
-        // Department exists, now check if branchID exists in the branch table
-        $checkBranchQuery = "SELECT * FROM branch WHERE branchID = '$branchID'";
-        $branchResult = mysqli_query($conn, $checkBranchQuery);
-
-        if (mysqli_num_rows($branchResult) > 0) {
-            // Branch exists, proceed with employee insertion
-            $query = "INSERT INTO employee (departmentID, branchID, firstName, lastName, email, phoneNumber, role, salary, hireDate)
-                      VALUES ('$departmentID', '$branchID','$firstName', '$lastName', '$email', '$phoneNumber', '$role', '$salary', '$hireDate')";
-            if (mysqli_query($conn, $query)) {
-                $message = "Employee added successfully.";
-                header("Location: ../manage_employees.php?message=" . urlencode($message));
-                exit();
-            } else {
-                $message = "Error adding employee: " . mysqli_error($conn);
+        if (mysqli_num_rows($departmentResult) > 0) {
+            // Department exists, now check if branchID exists in the branch table
+            if($branchID != NULL){
+                $checkBranchQuery = "SELECT * FROM branch WHERE branchID = '$branchID'";
+                $branchResult = mysqli_query($conn, $checkBranchQuery);
+        
+                if (mysqli_num_rows($branchResult) > 0) {
+                    // Branch exists, proceed with employee insertion
+                    $query = "INSERT INTO employee (departmentID, branchID, firstName, lastName, email, phoneNumber, role, salary, hireDate)
+                            VALUES ('$departmentID', '$branchID','$firstName', '$lastName', '$email', '$phoneNumber', '$role', '$salary', '$hireDate')";
+                    if (mysqli_query($conn, $query)) {
+                        $message = "Employee added successfully.";
+                        header("Location: ../manage_employees.php?message=" . urlencode($message));
+                        exit();
+                    } else {
+                        $message = "Error adding employee: " . mysqli_error($conn);
+                    }
+                } else {
+                    // Branch does not exist
+                    $message = "Invalid Branch ID. Please enter a valid branch.";
+                }
             }
-        } else {
-            // Branch does not exist
-            $message = "Invalid Branch ID. Please enter a valid branch.";
-        }
-    } else {
+        $query = "INSERT INTO employee (departmentID, firstName, lastName, email, phoneNumber, role, salary, hireDate)
+                            VALUES ('$departmentID','$firstName', '$lastName', '$email', '$phoneNumber', '$role', '$salary', '$hireDate')";
+                if (mysqli_query($conn, $query)) {
+                    $message = "Employee added successfully.";
+                    header("Location: ../manage_employees.php?message=" . urlencode($message));
+                    exit();
+                } else {
+                    $message = "Error adding employee: " . mysqli_error($conn);
+                }
+            }
+     else {
         // Department does not exist
         $message = "Invalid Department ID. Please enter a valid department.";
     }
@@ -151,7 +162,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     </div>
                     <div>
                         <label for="branchID">Branch ID</label>
-                        <input type="text" id="branchID" name="branchID" required>
+                        <input type="text" id="branchID" name="branchID">
                     </div>
                     <div>
                         <label for="firstName">First Name</label>
