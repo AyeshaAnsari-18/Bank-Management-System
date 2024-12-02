@@ -37,16 +37,18 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $message = "Invalid Branch Manager ID. Please enter a valid employee ID.";
         }
         }
-        $query = "INSERT INTO branch (branchName, location,  performanceRating)
+        else{
+            $query = "INSERT INTO branch (branchName, location,  performanceRating)
                     VALUES ('$branchName', '$location', '$performanceRating')";
             
-        if (mysqli_query($conn, $query)) {
-            $message = "Branch added successfully.";
-            header("Location: ../manage_branch.php?message=" . urlencode($message));
-            exit();
-        } else {
-            $message = "Error adding branch: " . mysqli_error($conn);
-            }
+            if (mysqli_query($conn, $query)) {
+                $message = "Branch added successfully.";
+                header("Location: ../manage_branch.php?message=" . urlencode($message));
+                exit();
+            } else {
+                $message = "Error adding branch: " . mysqli_error($conn);
+                }
+        }
     }
     else {
         $message = "Performance Rating must be a number between 1 and 5.";
@@ -136,6 +138,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 <a href="../manage_transaction.php">Transaction Management</a>
                 <a href="../approve_loans.php">Loan Management</a>
                 <a href="../manage_branch.php">Branch Management</a>
+                <a href="../manage_department.php">Department Management</a>
                 <a href="../manage_support.php">Customer Feedback Management</a>
                 <a href="adminlogin.html">Logout</a>
             </nav>

@@ -1,6 +1,6 @@
 <?php
 session_start();
-include '../connection.php'; // Database connection
+include '../connection.php';
 
 // Check if admin is logged in
 if (!isset($_SESSION['admin_id'])) {
@@ -8,12 +8,12 @@ if (!isset($_SESSION['admin_id'])) {
     exit();
 }
 
-// Fetch all transactions
-$result = mysqli_query($conn, "SELECT * FROM transaction");
+// Fetch all customers
+$result = mysqli_query($conn, "SELECT * FROM department");
 if (!$result) {
-    die("Error fetching transactions: " . mysqli_error($conn));
+    die("Error fetching departments: " . mysqli_error($conn));
 }
-$transactions = mysqli_fetch_all($result, MYSQLI_ASSOC);
+$departments = mysqli_fetch_all($result, MYSQLI_ASSOC);
 
 // Get message from query string
 $message = isset($_GET['message']) ? $_GET['message'] : '';
@@ -24,8 +24,8 @@ $message = isset($_GET['message']) ? $_GET['message'] : '';
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Manage Transactions</title>
-    <link rel="stylesheet" href="../css/admintransaction.css">
+    <title>Manage Departments</title>
+    <link rel="stylesheet" href="../css/adminpages.css">
     <style>
         .user-info h1{
             font-size: 40px;
@@ -74,23 +74,21 @@ $message = isset($_GET['message']) ? $_GET['message'] : '';
             cursor: pointer;
         }
         .action-buttons button.update {
-            background-color: #032d60;
+            background-color: darkblue;
             color: white;
             border: none;
         }
         .action-buttons button.delete {
-            background-color: #032d60;
+            background-color: darkblue;
             color: white;
             border: none;
         }
         .action-buttons button:hover {
             opacity: 0.8;
-            background-color: rgb(38, 152, 212);
         }
     </style>
 </head>
 <body>
-
     <div id="main">
         <!-- Header Section -->
         <header class="header">
@@ -114,51 +112,46 @@ $message = isset($_GET['message']) ? $_GET['message'] : '';
 
         <!-- Main Content -->
         <div class="user-info">
-            <h1>Transactions Information</h1>
+            <h1>Department Information</h1>
             <?php if (!empty($message)): ?>
                 <p style="color:green;" class="message"><?= htmlspecialchars($message); ?></p>
             <?php endif; ?>
 
             <!-- Action Buttons -->
             <div class="buttons">
-                <button onclick="window.location.href='TransactionManagement/create_tr.php'">Insert New Transaction</button>
+                <button onclick="window.location.href='DepartmentManagement/create_dep.php'">Insert New Department</button>
             </div>
 
-            <!-- Transaction Table -->
+            <!-- Customer Table -->
             <table>
                 <thead>
                     <tr>
-                    <th>Transaction ID</th>
-                    <th>Account ID</th>
-                    <th>Date</th>
-                    <th>Type</th>
-                    <th>Amount</th>
-                    <th>Action</th>
+                        <th>Department ID</th>
+                        <th>Department Name</th>
+                        <th>Manager ID</th>
+                        <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody>
-                    
-                    <?php foreach ($transactions as $transaction): ?>
-                    <tr>
-                        <td><?= htmlspecialchars($transaction['transactionID'] ?? 'N/A'); ?></td>
-                        <td><?= htmlspecialchars($transaction['account_AccountID'] ?? 'N/A'); ?></td>
-                        <td><?= htmlspecialchars($transaction['transactionDate'] ?? 'N/A'); ?></td>
-                        <td><?= htmlspecialchars($transaction['transactionType'] ?? 'N/A'); ?></td>
-                        <td><?= htmlspecialchars($transaction['transactionAmount'] ?? 'N/A'); ?></td>
-                        <td>
-                            <div class="action-buttons">
-                            <button class="update" 
-                                onclick="window.location.href='TransactionManagement/update_tr.php?transactionID=<?= $transaction['transactionID']; ?>'">
-                                Update
-                            </button>
-                            <button class="delete" 
-                                onclick="if(confirm('Are you sure you want to delete this transaction?')) 
-                                window.location.href='TransactionManagement/delete_tr.php?transactionID=<?= $transaction['transactionID']; ?>'">
-                                Delete
-                            </button>
-                            </div>
-                        </td>
-                    </tr>
+                    <?php foreach ($departments as $department): ?>
+                        <tr>
+                            <td><?= htmlspecialchars($department['departmentID'] ?? 'N/A'); ?></td>
+                            <td><?= htmlspecialchars($department['departmentName'] ?? 'N/A'); ?></td>
+                            <td><?= htmlspecialchars($department['managerID'] ?? 'N/A'); ?></td>
+                            <td>
+                                <div class="action-buttons">
+                                    <button class="update" 
+                                        onclick="window.location.href='DepartmentManagement/update_dep.php?departmentID=<?= $department['departmentID']; ?>'">
+                                        Update
+                                    </button>
+                                    <button class="delete" 
+                                        onclick="if(confirm('Are you sure you want to delete this employee?')) 
+                                            window.location.href='DepartmentManagement/delete_dep.php?departmentID=<?= $department['departmentID']; ?>'">
+                                        Delete
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
                     <?php endforeach; ?>
                 </tbody>
             </table>
