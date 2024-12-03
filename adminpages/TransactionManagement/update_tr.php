@@ -99,7 +99,7 @@ if ($transaction_id) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Create Customer</title>
+    <title>Update Transaction</title>
     <link rel="stylesheet" href="../../css/adminpages.css">
     <style>
         body {
@@ -196,9 +196,11 @@ if ($transaction_id) {
                 <a href="../manage_users.php">Customer Management</a>
                 <a href="../manage_employees.php">Employee Management</a>
                 <a href="../manage_transaction.php">Transaction Management</a>
-                <a href="../approve_loans.php">Loan Management</a>
+                <a href="../manage_loan.php">Loan Management</a>
                 <a href="../manage_branch.php">Branch Management</a>
                 <a href="../manage_support.php">Customer Feedback Management</a>
+                <a href="../manage_reports.php">Reports and Analytics</a>
+                <a href="../manage_audit_logs.php">Audit Logs</a>
                 <a href="../manage_department.php">Department Management</a>
                 <a href="adminlogin.html">Logout</a>
             </nav>

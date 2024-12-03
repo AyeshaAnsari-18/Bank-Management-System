@@ -24,7 +24,7 @@ $message = isset($_GET['message']) ? $_GET['message'] : '';
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Manage Employees</title>
+    <title>Manage Branch</title>
     <link rel="stylesheet" href="../css/adminpages.css">
     <style>
         .user-info h1{
