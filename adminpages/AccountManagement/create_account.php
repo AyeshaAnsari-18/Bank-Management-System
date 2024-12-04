@@ -9,40 +9,21 @@ if (!isset($_SESSION['admin_id'])) {
     exit();
 }
 
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $managerID = $_POST['managerID'];
-    $departmentName = $_POST['departmentName'];
-    if($managerID!=NULL){
-        $checkManagerQuery = "SELECT * FROM employee WHERE employeeID = '$managerID'";
-        $managerResult = mysqli_query($conn, $checkManagerQuery);
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create'])) {
+    // Sanitize input
+    $account_type = mysqli_real_escape_string($conn, $_POST['account_type']);
+    $balance = $_POST['balance'];
 
-        if (mysqli_num_rows($managerResult) > 0) {
-            // Manager exists, proceed with branch insertions
-            $query = "INSERT INTO department (departmentName, managerID)VALUES ('$departmentName', '$managerID')";
-            
-            if (mysqli_query($conn, $query)) {
-                $message = "Department added successfully.";
-                header("Location: ../manage_department.php?message=" . urlencode($message));
-                exit();
-            } else {
-                $message = "Error adding department: " . mysqli_error($conn);
-            }
-        } else {
-            $message = "Invalid Manager ID. Please enter a valid employee ID.";
-        }
+    // Insert into `account` table
+    $sql = "INSERT INTO account (AccountType, Balance) VALUES ('$account_type', '$balance')";
+    if (mysqli_query($conn, $sql)) {
+        $message = "Account created successfully.";
+        header("Location: ../manage_account.php?message=" . urlencode($message));
+        exit();
+    } else {
+        $message = "Error inserting account: " . mysqli_error($conn);
     }
-        else{
-            $query = "INSERT INTO department(departmentName) VALUES ('$departmentName')";
-            
-        if (mysqli_query($conn, $query)) {
-            $message = "Department added successfully.";
-            header("Location: ../manage_department.php?message=" . urlencode($message));
-            exit();
-        } else {
-            $message = "Error adding department: " . mysqli_error($conn);
-            }
-        }
-    }
+}
 ?>
 
 <!DOCTYPE html>
@@ -50,9 +31,71 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Create Department</title>
+    <title>Create Account</title>
     <link rel="stylesheet" href="../../css/adminpages.css">
     <style>
+        .user-info h1 {
+            font-size: 40px;
+        }
+        .message {
+            color: green;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        table th, table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: center;
+        }
+        table th {
+            background-color: #f4f4f4;
+            font-weight: bold;
+        }
+        .buttons {
+            margin: 15px 15px;
+            display: flex;
+            gap: 10px;
+        }
+        .buttons button:hover {
+            background-color: rgb(28, 120, 211);
+            color: white;
+        }
+        .buttons button {
+            padding: 10px;
+            background-color: #032d60;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+        .action-buttons button {
+            padding: 5px 10px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+        .action-buttons button.update {
+            background-color: #032d60;
+            color: white;
+            border: none;
+        }
+        .action-buttons button.delete {
+            background-color: #032d60;
+            color: white;
+            border: none;
+        }
+        .action-buttons button:hover {
+            opacity: 0.8;
+            background-color: rgb(38, 152, 212);
+        }
         body {
             font-family: Arial, sans-serif;
             background-color: #f4f4f9;
@@ -70,7 +113,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         .card h2 {
             margin-bottom: 20px;
             font-size: 24px;
-            color: darkblue;
+            color: #333;
             text-align: center;
         }
         .form {
@@ -116,9 +159,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 </head>
 <body>
     <div id="main">
-    <header class="header">
-            <div id="logo" style="padding-top: 20px;">
-                <img src="../../logo.png" alt="Bank Logo">
+        <header class="header">
+        <div id="logo" style="padding-top: 20px;">
+            <img src="../../logo.png" alt="Bank Logo">
             </div>
             <nav class="nav-links">
                 <a href="../adminhome.php">Home</a>
@@ -137,20 +180,20 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         </header>
         <div class="user-info">
             <div class="card">
-                <h2>Add Department</h2>
+                <h2>Create Account</h2>
                 <?php if (!empty($message)): ?>
                     <p class="message"><?= htmlspecialchars($message); ?></p>
                 <?php endif; ?>
                 <form class="form" method="POST" action="">
                     <div>
-                        <label for="departmentName">Department Name</label>
-                        <input type="text" id="departmentName" name="departmentName" required>
+                        <label for="account_type">Account Type</label>
+                        <input type="text" id="account_type" name="account_type" required>
                     </div>
                     <div>
-                        <label for="managerID">Manager ID</label>
-                        <input type="text" id="managerID" name="managerID" >
+                        <label for="balance">Balance</label>
+                        <input type="number" id="balance" name="balance" required>
                     </div>
-                    <button type="submit" name="create">Add Department</button>
+                    <button type="submit" name="create">Create Account</button>
                 </form>
             </div>
         </div>
