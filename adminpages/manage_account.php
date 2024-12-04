@@ -8,12 +8,15 @@ if (!isset($_SESSION['admin_id'])) {
     exit();
 }
 
-// Fetch all customers
-$result = mysqli_query($conn, "SELECT * FROM customer");
-if (!$result) {
-    die("Error fetching customers: " . mysqli_error($conn));
+// Fetch all accounts
+$account_result = mysqli_query($conn, "SELECT * FROM account");
+if (!$account_result) {
+    // Debugging output for query error
+    error_log("Error fetching accounts: " . mysqli_error($conn));
+    $accounts = []; // Default to empty array if query fails
+} else {
+    $accounts = mysqli_fetch_all($account_result, MYSQLI_ASSOC);
 }
-$customers = mysqli_fetch_all($result, MYSQLI_ASSOC);
 
 // Get message from query string
 $message = isset($_GET['message']) ? $_GET['message'] : '';
@@ -24,10 +27,10 @@ $message = isset($_GET['message']) ? $_GET['message'] : '';
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Manage Customers</title>
+    <title>Manage Accounts</title>
     <link rel="stylesheet" href="../css/adminpages.css">
     <style>
-        .user-info h1{
+        .user-info h1 {
             font-size: 40px;
         }
         .message {
@@ -51,8 +54,8 @@ $message = isset($_GET['message']) ? $_GET['message'] : '';
         }
         .buttons {
             margin: 15px 15px;
-            width: 20%;
-            height:40px;
+            display: flex;
+            gap: 10px;
         }
         .buttons button:hover {
             background-color: rgb(28, 120, 211);
@@ -62,6 +65,8 @@ $message = isset($_GET['message']) ? $_GET['message'] : '';
             padding: 10px;
             background-color: #032d60;
             color: white;
+            border: none;
+            cursor: pointer;
         }
         .action-buttons {
             display: flex;
@@ -114,55 +119,53 @@ $message = isset($_GET['message']) ? $_GET['message'] : '';
 
         <!-- Main Content -->
         <div class="user-info">
-            <h1>Customer Information</h1>
+            <h1>Account Information</h1>
             <?php if (!empty($message)): ?>
                 <p style="color:green;" class="message"><?= htmlspecialchars($message); ?></p>
             <?php endif; ?>
 
             <!-- Action Buttons -->
             <div class="buttons">
-                <button onclick="window.location.href='CustomerManagement/create_user.php'">Insert New Customer</button>
+                <button onclick="window.location.href='AccountManagement/create_account.php'">Insert New Account</button>
             </div>
 
-            <!-- Customer Table -->
+            <!-- Accounts Table -->
             <table>
                 <thead>
                     <tr>
-                        <th>Customer ID</th>
                         <th>Account ID</th>
-                        <th>Name</th>
-                        <th>Email</th>
-                        <th>Address</th>
-                        <th>Date of Birth</th>
-                        <th>Phone</th>
+                        <th>Account Type</th>
+                        <th>Balance</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <?php foreach ($customers as $customer): ?>
+                    <?php if (!empty($accounts)): ?>
+                        <?php foreach ($accounts as $account): ?>
+                            <tr>
+                                <td><?= htmlspecialchars($account['AccountID'] ?? 'N/A'); ?></td>
+                                <td><?= htmlspecialchars($account['AccountType'] ?? 'N/A'); ?></td>
+                                <td><?= htmlspecialchars(number_format($account['Balance'] ?? 0, 2)); ?></td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <button class="update" 
+                                            onclick="window.location.href='AccountManagement/update_account.php?account_id=<?= $account['AccountID']; ?>'">
+                                            Update
+                                        </button>
+                                        <button class="delete" 
+                                            onclick="if(confirm('Are you sure you want to delete this account?')) 
+                                                window.location.href='AccountManagement/delete_account.php?account_id=<?= $account['AccountID']; ?>'">
+                                            Delete
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    <?php else: ?>
                         <tr>
-                            <td><?= htmlspecialchars($customer['customerId'] ?? 'N/A'); ?></td>
-                            <td><?= htmlspecialchars($customer['account_accountID'] ?? 'N/A'); ?></td>
-                            <td><?= htmlspecialchars($customer['Name'] ?? 'N/A'); ?></td>
-                            <td><?= htmlspecialchars($customer['Email'] ?? 'N/A'); ?></td>
-                            <td><?= htmlspecialchars($customer['Address'] ?? 'N/A'); ?></td>
-                            <td><?= htmlspecialchars($customer['DateOfBirth'] ?? 'N/A'); ?></td>
-                            <td><?= htmlspecialchars($customer['Phone'] ?? 'N/A'); ?></td>
-                            <td>
-                                <div class="action-buttons">
-                                    <button class="update" 
-                                        onclick="window.location.href='CustomerManagement/update_user.php?customer_id=<?= $customer['customerId']; ?>'">
-                                        Update
-                                    </button>
-                                    <button class="delete" 
-                                        onclick="if(confirm('Are you sure you want to delete this customer?')) 
-                                            window.location.href='CustomerManagement/delete_user.php?customer_id=<?= $customer['customerId']; ?>'">
-                                        Delete
-                                    </button>
-                                </div>
-                            </td>
+                            <td colspan="4">No accounts found.</td>
                         </tr>
-                    <?php endforeach; ?>
+                    <?php endif; ?>
                 </tbody>
             </table>
         </div>
